@@ -4,4 +4,9 @@ node_modules
 **.data.json
 **.node-persist**
 **_IGNORE_**
+
+settings/key.json
+
 # end managed
+
+

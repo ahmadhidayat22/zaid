@@ -48,10 +48,8 @@ nocache('./lib/menu.js', module => console.log(`'${module} updated!'`))
 nocache(__filename, module => console.log(`'${module}' Updated!`))
 
 function start(client) {
-  var lines = process.stdout.getWindowSize()[1];
-  for(var i = 0; i < lines; i++) {
-      console.log('\r\n');
-  }
+  console.log('\x1Bc')
+
   console.log(color(figlet.textSync('----------------', { horizontalLayout: 'default' })))
   console.log(color(figlet.textSync('Zaid Bot', { font: 'Ghost', horizontalLayout: 'default' })))
   console.log(color(figlet.textSync('----------------', { horizontalLayout: 'default' })))
