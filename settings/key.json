@@ -1,0 +1,9 @@
+{
+    "gemini" : "ISI_APIKEY_DISINI",
+    "keyopenai": "ISI_APIKEY_OPENAI_DISINI",
+    "rapidApi" : "ISI_APIKEY_DISINI",
+    "client_id" : "ISI_APIKEY_DISINI",
+    "client_secret" : "ISI_APIKEY_DISINI",
+    "base_url" : "https://api.aspose.cloud"
+
+}
