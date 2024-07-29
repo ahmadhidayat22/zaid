@@ -44,7 +44,9 @@ const startTime = Date.now()
 require('./message')
 nocache('./message', module => console.log(`'${module} updated!'`))
 require('./lib/menu.js')
+require('./lib');
 nocache('./lib/menu.js', module => console.log(`'${module} updated!'`))
+nocache('./lib', module => console.log(`'${module} updated!'`))
 nocache(__filename, module => console.log(`'${module}' Updated!`))
 
 function start(client) {
@@ -64,14 +66,18 @@ function start(client) {
   })
 
   client.onMessage(async (message) => {
-    client.getAmountOfLoadedMessages() // menghapus pesan cache jika sudah 3000 pesan.
-            .then((msg) => {
-                if (msg >= 3000) {
-                    console.log('[BOT]', color(`Loaded Message Reach ${msg}, cuting message cache...`, 'yellow'))
-                    client.cutMsgCache()
-                }
-            })
-    require('./message')(client, message , startTime)
+    try{
+      client.getAmountOfLoadedMessages() // menghapus pesan cache jika sudah 3000 pesan.
+              .then((msg) => {
+                  if (msg >= 1000) {
+                      console.log('[BOT]', color(`Loaded Message Reach ${msg}, cuting message cache...`, 'yellow'))
+                      client.cutMsgCache()
+                  }
+              })
+      require('./message')(client, message , startTime)
+    }catch(e){
+      console.log(color("ERROR", "red"), e);
+    }
   });
 
 }
