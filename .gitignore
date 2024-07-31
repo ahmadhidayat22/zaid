@@ -5,7 +5,7 @@ node_modules
 **.node-persist**
 **_IGNORE_**
 
-settings/key.json
+key.json
 temp/*.json
 
 # end managed

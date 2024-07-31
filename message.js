@@ -18,22 +18,10 @@ const sleep = async (ms) => {
 };
 
 ////////////////////MENU///////////////////////////
-const { 
-  menu, 
-  filetype, 
-  convert, 
-  point,
-  fun,
-  ai
-
-} = require("./lib");
+const { menu, filetype, convert, point, fun, ai } = require("./lib");
 const { log } = require("console");
 
-
-const { 
-  
-  isUrl,
-  processTime } = require("./utils");
+const { isUrl, processTime } = require("./utils");
 const kuismtk = JSON.parse(fs.readFileSync("./settings/kuismtk.json"));
 const kuismtkk = JSON.parse(fs.readFileSync("./settings/kuismtkk.json"));
 //////////////////////////////FOLDER SYSTEM///////////////////////////////////
@@ -48,15 +36,15 @@ let easy = JSON.parse(fs.readFileSync("./settings/easy.json"));
 let medium = JSON.parse(fs.readFileSync("./settings/medium.json"));
 let hard = JSON.parse(fs.readFileSync("./settings/hard.json"));
 const _point = JSON.parse(fs.readFileSync("./settings/point.json"));
-let updateBot = JSON.parse(fs.readFileSync('./settings/update.json'))
+let updateBot = JSON.parse(fs.readFileSync("./settings/update.json"));
 
 let { ownerNumber, groupLimit, limitCount, memberLimit, prefix } = setting;
 
 module.exports = message = async (m, message, startTime) => {
 	try {
-		let _user = JSON.parse(fs.readFileSync('./settings/user.json'));
+		let _user = JSON.parse(fs.readFileSync("./settings/user.json"));
 
-    	const banned = JSON.parse(fs.readFileSync("./settings/banned.json"));
+		const banned = JSON.parse(fs.readFileSync("./settings/banned.json"));
 		const timerEasy = 5000;
 		const timerMed = 10000;
 		const timerHard = 20000;
@@ -124,7 +112,7 @@ module.exports = message = async (m, message, startTime) => {
 		const isKuis = isGroupMsg ? kuis.includes(chat.id) : false;
 		const isMtk = isGroupMsg ? kuismtk.includes(chat.id) : false;
 		const isMtkk = isGroupMsg ? kuismtkk.includes(chat.id) : false;
-    	const checkStat = isCmd && command == 'mystat'? true : false ;
+		const checkStat = isCmd && command == "mystat" ? true : false;
 		const isTeks = args.length == 0 ? true : false;
 		const pathname = `./temp/${chatId}.json`;
 
@@ -158,25 +146,23 @@ module.exports = message = async (m, message, startTime) => {
 		const isOwnerBot = ownerNumber.includes(pengirim);
 		const isBanned = banned.includes(pengirim);
 		// log(chat.id, chatId)
-		const SaveUserHistoryAi = async(userdata) => {
-
-			const dir ='./temp';
-			if (!fs.existsSync(dir)){
+		const SaveUserHistoryAi = async (userdata) => {
+			const dir = "./temp";
+			if (!fs.existsSync(dir)) {
 				fs.mkdirSync(dir);
 			}
 			try {
-				
-				await userdata.forEach(item => {
+				await userdata.forEach((item) => {
 					const filePath = `${dir}/${item}.json`; // Buat nama file berdasarkan ID
 
-					if(fs.existsSync(filePath)){
+					if (fs.existsSync(filePath)) {
 						console.log(`File ${filePath} already exists. Skipping.`);
 						return;
 					}
 					// const jsonData = JSON.stringify(item, null, 2); // Konversi data ke format JSON dengan indentsi 2
-			
+
 					// Tulis data ke file JSON
-					fs.writeFile(filePath, "[]", 'utf8', (err) => {
+					fs.writeFile(filePath, "[]", "utf8", (err) => {
 						if (err) {
 							console.error(`Error writing file ${filePath}:`, err);
 						} else {
@@ -184,18 +170,19 @@ module.exports = message = async (m, message, startTime) => {
 						}
 					});
 				});
-					
 			} catch (error) {
-				console.log(color("ERROR", 'red'), error);
+				console.log(color("ERROR", "red"), error);
 			}
-
-		}
+		};
 		const saveUser = async () => {
 			try {
 				if (_user.length === 0) {
 					_isRegistered = true;
 					_user.push(chat.id);
-					await fs.promises.writeFile('./settings/user.json', JSON.stringify(_user, null, 2));
+					await fs.promises.writeFile(
+						"./settings/user.json",
+						JSON.stringify(_user, null, 2)
+					);
 					await SaveUserHistoryAi(_user);
 					console.log("Success: Added new user data");
 				} else {
@@ -203,7 +190,10 @@ module.exports = message = async (m, message, startTime) => {
 					if (!isExist) {
 						_user.push(chat.id);
 						_isRegistered = true;
-						await fs.promises.writeFile('./settings/user.json', JSON.stringify(_user, null, 2));
+						await fs.promises.writeFile(
+							"./settings/user.json",
+							JSON.stringify(_user, null, 2)
+						);
 						await SaveUserHistoryAi(_user);
 						console.log("Success: Saved user data");
 					}
@@ -214,13 +204,14 @@ module.exports = message = async (m, message, startTime) => {
 		};
 
 		if (isCmd && !isGroupMsg && !isBanned)
-			
-			console.log(color("[CMD]"),color(time, "yellow"),color(`${prefix}${command} [${teks_singkat}]`),
+			console.log(
+				color("[CMD]"),
+				color(time, "yellow"),
+				color(`${prefix}${command} [${teks_singkat}]`),
 				"from",
 				color(pushname)
 			);
 		if (isCmd && isGroupMsg && !isBanned)
-			
 			console.log(
 				color("[CMD]"),
 				color(time, "yellow"),
@@ -230,8 +221,24 @@ module.exports = message = async (m, message, startTime) => {
 				"in",
 				color(name || formattedTitle)
 			);
-      if (isCmd && isBanned && !isGroupMsg && !checkStat) return console.log(color('[BAN]', 'red'), color(time, 'yellow'), color(`${command} [${args.length}]`), 'from', color(pushname))
-      if (isCmd && isBanned && isGroupMsg && !checkStat) return console.log(color('[BAN]', 'red'), color(time, 'yellow'), color(`${command} [${args.length}]`), 'from', color(pushname), 'in', color(name || formattedTitle))
+		if (isCmd && isBanned && !isGroupMsg && !checkStat)
+			return console.log(
+				color("[BAN]", "red"),
+				color(time, "yellow"),
+				color(`${command} [${args.length}]`),
+				"from",
+				color(pushname)
+			);
+		if (isCmd && isBanned && isGroupMsg && !checkStat)
+			return console.log(
+				color("[BAN]", "red"),
+				color(time, "yellow"),
+				color(`${command} [${args.length}]`),
+				"from",
+				color(pushname),
+				"in",
+				color(name || formattedTitle)
+			);
 
 		const calcRuntime = () => {
 			const endTime = Date.now();
@@ -335,6 +342,10 @@ module.exports = message = async (m, message, startTime) => {
 				console.log(color("error", "red"), error);
 			}
 		};
+
+		const sayMaintenance = async (In, to) => {
+			await m.reply(In, "maaf fitur masih dibuat", to);
+		};
 		/////////////////////// QUIZ MTK //////////////////////////////
 
 		if (isGroupMsg) {
@@ -359,36 +370,62 @@ module.exports = message = async (m, message, startTime) => {
 				);
 			}
 			if (medium.includes(chats)) {
-				await m.reply(from, `Jawaban Benar, Selamat Anda Mendapatkan 10 Points\nMau Lanjut ? Silahkan Ketik Next`, id)
-                point.addCooldown(sender.id)
-                point.addLevelingPoint(sender.id, 10, _point)
-                let tebakmedium = medium.indexOf(chats);
-                medium.splice(tebakmedium, 1)
-                fs.writeFileSync('./settings/medium.json', JSON.stringify(medium, null, 2))
-                let kues = kuismtk.indexOf(chatId)
-                kuismtk.splice(kues, 1)
-                fs.writeFileSync('./settings/kuismtk.json', JSON.stringify(kuismtk, null, 2))
+				await m.reply(
+					from,
+					`Jawaban Benar, Selamat Anda Mendapatkan 10 Points\nMau Lanjut ? Silahkan Ketik Next`,
+					id
+				);
+				point.addCooldown(sender.id);
+				point.addLevelingPoint(sender.id, 10, _point);
+				let tebakmedium = medium.indexOf(chats);
+				medium.splice(tebakmedium, 1);
+				fs.writeFileSync(
+					"./settings/medium.json",
+					JSON.stringify(medium, null, 2)
+				);
+				let kues = kuismtk.indexOf(chatId);
+				kuismtk.splice(kues, 1);
+				fs.writeFileSync(
+					"./settings/kuismtk.json",
+					JSON.stringify(kuismtk, null, 2)
+				);
 			}
 			if (hard.includes(chats)) {
-				await m.reply(from, `Jawaban Benar, Selamat Anda Mendapatkan 20 Points\nMau Lanjut ? Silahkan Ketik Next`, id)
-                point.addCooldown(sender.id)
-                point.addLevelingPoint(sender.id, 20, _point)
-                let tebakhard = hard.indexOf(chats);
-                hard.splice(tebakhard, 1)
-                fs.writeFileSync('./settings/hard.json', JSON.stringify(hard, null, 2))
-                let kues = kuismtk.indexOf(chatId)
-                kuismtk.splice(kues, 1)
-                fs.writeFileSync('./settings/kuismtk.json', JSON.stringify(kuismtk, null, 2))
+				await m.reply(
+					from,
+					`Jawaban Benar, Selamat Anda Mendapatkan 20 Points\nMau Lanjut ? Silahkan Ketik Next`,
+					id
+				);
+				point.addCooldown(sender.id);
+				point.addLevelingPoint(sender.id, 20, _point);
+				let tebakhard = hard.indexOf(chats);
+				hard.splice(tebakhard, 1);
+				fs.writeFileSync("./settings/hard.json", JSON.stringify(hard, null, 2));
+				let kues = kuismtk.indexOf(chatId);
+				kuismtk.splice(kues, 1);
+				fs.writeFileSync(
+					"./settings/kuismtk.json",
+					JSON.stringify(kuismtk, null, 2)
+				);
 			}
 		}
 
-		if (chats == 'Next' || chats == 'next') {
-            if (!isGroupMsg) return m.reply(from, 'Perintah ini hanya bisa di gunakan dalam group!', id)
-            await m.reply(from, ind.wait(), id)
-            await m.reply(from, `Silahkan Pilih Level Kuiz\n*Easy*\n*Medium*\n*Hard*`, id)
-            kuismtkk.push(chat.id)
-            fs.writeFileSync('./settings/kuismtkk.json', JSON.stringify(kuismtkk))
-        }
+		if (chats == "Next" || chats == "next") {
+			if (!isGroupMsg)
+				return m.reply(
+					from,
+					"Perintah ini hanya bisa di gunakan dalam group!",
+					id
+				);
+			await m.reply(from, ind.wait(), id);
+			await m.reply(
+				from,
+				`Silahkan Pilih Level Kuiz\n*Easy*\n*Medium*\n*Hard*`,
+				id
+			);
+			kuismtkk.push(chat.id);
+			fs.writeFileSync("./settings/kuismtkk.json", JSON.stringify(kuismtkk));
+		}
 
 		if (isGroupMsg && kuismtkk.includes(chatId)) {
 			if (chats == "Easy" || chats == "easy") {
@@ -422,7 +459,7 @@ module.exports = message = async (m, message, startTime) => {
 				await sleep(timerEasy);
 				if (kuismtk.includes(chat.id)) {
 					let kuii = kuismtk.indexOf(chatId);
-					let res = easy.indexOf(Math_js.evaluate(`${kuli}${meti}${kuli2}`));
+					let res = easy.indexOf(Math_js.evaluate(`${kuli}${meti}${kuil2}`));
 
 					kuismtk.splice(kuii, 1);
 					fs.writeFileSync(
@@ -432,7 +469,10 @@ module.exports = message = async (m, message, startTime) => {
 					easy.splice(res, 1);
 					// log(easy);
 
-					fs.writeFileSync("./settings/easy.json",JSON.stringify(easy, null, 2));
+					fs.writeFileSync(
+						"./settings/easy.json",
+						JSON.stringify(easy, null, 2)
+					);
 					await m.reply(
 						from,
 						`waktu habis..\nJawabannya : ${Math_js.evaluate(
@@ -444,80 +484,119 @@ module.exports = message = async (m, message, startTime) => {
 			}
 
 			if (chats == "Medium" || chats == "medium") {
-				if (!isMtkk) return
-                if (isMtk) return m.reply(from, `Kuis Mtk Sedang Berlangsung`, id)
-                const kuli = mtkmedium[Math.floor(Math.random() * (mtkmedium.length))]
-                const kuli2 = mtkmedium[Math.floor(Math.random() * (mtkmedium.length))]
-                const mety = ['+', '*']
-                const meti = mety[Math.floor(Math.random() * (mety.length))]
-                await m.reply(from, `Hasil Dari : \n${kuli} ${meti.replace('*', 'x')} ${kuli2} adalah`, id)
-                kuismtk.push(chat.id)
-                fs.writeFileSync('./settings/kuismtk.json', JSON.stringify(kuismtk))
-                if (typeof Math_js.evaluate(`${kuli} ${meti} ${kuli2}`) !== "number") {
-                    await m.reply(from, ind.notNum(`${kuli}`), id)
-                } else {
-                    medium.push(`${Math_js.evaluate(`${kuli}${meti}${kuli2}`)}`)
-                    fs.writeFileSync('./settings/medium.json', JSON.stringify(medium))
-                }
-                let kuos = kuismtkk.indexOf(chatId)
-                kuismtkk.splice(kuos, 1)
-                fs.writeFileSync('./settings/kuismtkk.json', JSON.stringify(kuismtkk, null, 2))
+				if (!isMtkk) return;
+				if (isMtk) return m.reply(from, `Kuis Mtk Sedang Berlangsung`, id);
+				const kuli = mtkmedium[Math.floor(Math.random() * mtkmedium.length)];
+				const kuli2 = mtkmedium[Math.floor(Math.random() * mtkmedium.length)];
+				const mety = ["+", "*"];
+				const meti = mety[Math.floor(Math.random() * mety.length)];
+				await m.reply(
+					from,
+					`Hasil Dari : \n${kuli} ${meti.replace("*", "x")} ${kuli2} adalah`,
+					id
+				);
+				kuismtk.push(chat.id);
+				fs.writeFileSync("./settings/kuismtk.json", JSON.stringify(kuismtk));
+				if (typeof Math_js.evaluate(`${kuli} ${meti} ${kuli2}`) !== "number") {
+					await m.reply(from, ind.notNum(`${kuli}`), id);
+				} else {
+					medium.push(`${Math_js.evaluate(`${kuli}${meti}${kuli2}`)}`);
+					fs.writeFileSync("./settings/medium.json", JSON.stringify(medium));
+				}
+				let kuos = kuismtkk.indexOf(chatId);
+				kuismtkk.splice(kuos, 1);
+				fs.writeFileSync(
+					"./settings/kuismtkk.json",
+					JSON.stringify(kuismtkk, null, 2)
+				);
 				await m.sendText(from, `waktu anda ${timerMed / 1000} detik`);
-                await sleep(timerMed)
-                if (kuismtk.includes(chat.id)) {
-                    let kuii = kuismtk.indexOf(chatId)
-					let res = medium.indexOf(`${Math_js.evaluate(`${kuli}${meti}${kuli2}`)}`);
-                    kuismtk.splice(kuii, 1)
-					log(res)
-                    fs.writeFileSync('./settings/kuismtk.json', JSON.stringify(kuismtk, null, 2))
-					
-                    medium.splice(res, 1)
+				await sleep(timerMed);
+				if (kuismtk.includes(chat.id)) {
+					let kuii = kuismtk.indexOf(chatId);
+					let res = medium.indexOf(
+						`${Math_js.evaluate(`${kuli}${meti}${kuli2}`)}`
+					);
+					kuismtk.splice(kuii, 1);
+					log(res);
+					fs.writeFileSync(
+						"./settings/kuismtk.json",
+						JSON.stringify(kuismtk, null, 2)
+					);
+
+					medium.splice(res, 1);
 					// log(medium)
-                    fs.writeFileSync('./settings/medium.json', JSON.stringify(medium, null, 2))
-                    await m.reply(from, `waktu habis..\nJawabannya : ${Math_js.evaluate(`${kuli}${meti}${kuli2}`)}`, id)
-                }
+					fs.writeFileSync(
+						"./settings/medium.json",
+						JSON.stringify(medium, null, 2)
+					);
+					await m.reply(
+						from,
+						`waktu habis..\nJawabannya : ${Math_js.evaluate(
+							`${kuli}${meti}${kuli2}`
+						)}`,
+						id
+					);
+				}
 			}
 
 			if (chats == "Hard" || chats == "hard") {
-				if (!isMtkk) return
-                if (isMtk) return m.reply(from, `Kuis Mtk Sedang Berlangsung`, id)
-                const kull = mtkhard[Math.floor(Math.random() * (mtkhard.length))]
-                const kull2 = mtkhard[Math.floor(Math.random() * (mtkhard.length))]
-                const udin = ['+', '*']
-                const dinu = udin[Math.floor(Math.random() * (udin.length))]
-                await m.reply(from, `Hasil Dari : \n${kull} ${dinu.replace('*', 'x')} ${kull2} adalah`, id)
-                kuismtk.push(chat.id)
-                fs.writeFileSync('./settings/kuismtk.json', JSON.stringify(kuismtk))
-                if (typeof Math_js.evaluate(`${kull}${dinu}${kull2}`) !== "number") {
-                    await m.reply(from, ind.notNum(`${kull}`), id)
-                } else {
-                    hard.push(`${Math_js.evaluate(`${kull}${dinu}${kull2}`)}`)
-                    fs.writeFileSync('./settings/hard.json', JSON.stringify(hard))
-                }
-                let kuos = kuismtkk.indexOf(chatId)
-                kuismtkk.splice(kuos, 1)
-                fs.writeFileSync('./settings/kuismtkk.json', JSON.stringify(kuismtkk, null, 2))
+				if (!isMtkk) return;
+				if (isMtk) return m.reply(from, `Kuis Mtk Sedang Berlangsung`, id);
+				const kull = mtkhard[Math.floor(Math.random() * mtkhard.length)];
+				const kull2 = mtkhard[Math.floor(Math.random() * mtkhard.length)];
+				const udin = ["+", "*"];
+				const dinu = udin[Math.floor(Math.random() * udin.length)];
+				await m.reply(
+					from,
+					`Hasil Dari : \n${kull} ${dinu.replace("*", "x")} ${kull2} adalah`,
+					id
+				);
+				kuismtk.push(chat.id);
+				fs.writeFileSync("./settings/kuismtk.json", JSON.stringify(kuismtk));
+				if (typeof Math_js.evaluate(`${kull}${dinu}${kull2}`) !== "number") {
+					await m.reply(from, ind.notNum(`${kull}`), id);
+				} else {
+					hard.push(`${Math_js.evaluate(`${kull}${dinu}${kull2}`)}`);
+					fs.writeFileSync("./settings/hard.json", JSON.stringify(hard));
+				}
+				let kuos = kuismtkk.indexOf(chatId);
+				kuismtkk.splice(kuos, 1);
+				fs.writeFileSync(
+					"./settings/kuismtkk.json",
+					JSON.stringify(kuismtkk, null, 2)
+				);
 				await m.sendText(from, `waktu anda ${timerHard / 1000} detik`);
 
-                await sleep(timerHard)
-                if (kuismtk.includes(chat.id)) {
-                    let kuii = kuismtk.indexOf(chatId)
-					let res = hard.indexOf(`${Math_js.evaluate(`${kull}${dinu}${kull2}`)}`)
-                    kuismtk.splice(kuii, 1)
-                    fs.writeFileSync('./settings/kuismtk.json', JSON.stringify(kuismtk, null, 2))
-                    hard.splice(res, 1)
-                    fs.writeFileSync('./settings/hard.json', JSON.stringify(hard, null, 2))
-                    await m.reply(from, `waktu habis...\nJawabannya : ${Math_js.evaluate(`${kull}${dinu}${kull2}`)}`, id)
-
-                }
-
+				await sleep(timerHard);
+				if (kuismtk.includes(chat.id)) {
+					let kuii = kuismtk.indexOf(chatId);
+					let res = hard.indexOf(
+						`${Math_js.evaluate(`${kull}${dinu}${kull2}`)}`
+					);
+					kuismtk.splice(kuii, 1);
+					fs.writeFileSync(
+						"./settings/kuismtk.json",
+						JSON.stringify(kuismtk, null, 2)
+					);
+					hard.splice(res, 1);
+					fs.writeFileSync(
+						"./settings/hard.json",
+						JSON.stringify(hard, null, 2)
+					);
+					await m.reply(
+						from,
+						`waktu habis...\nJawabannya : ${Math_js.evaluate(
+							`${kull}${dinu}${kull2}`
+						)}`,
+						id
+					);
+				}
 			}
 		}
 
 		if (isCmd) {
 			await saveUser();
 			switch (command) {
-				
 				case "kuismtk":
 					if (isMtk) return m.reply(from, `Kuis Sedang Berlangsung`, id);
 					if (!isGroupMsg)
@@ -533,7 +612,10 @@ module.exports = message = async (m, message, startTime) => {
 						id
 					);
 					kuismtkk.push(chat.id);
-					fs.writeFileSync("./settings/kuismtkk.json",JSON.stringify(kuismtkk));
+					fs.writeFileSync(
+						"./settings/kuismtkk.json",
+						JSON.stringify(kuismtkk)
+					);
 					break;
 				case "leaderboard":
 					if (!isGroupMsg)
@@ -700,24 +782,22 @@ module.exports = message = async (m, message, startTime) => {
 
 				case "clearhistory":
 					try {
-						if(fs.existsSync(pathname)){
-							const data = fs.readFileSync(pathname, 'utf8');
+						if (fs.existsSync(pathname)) {
+							const data = fs.readFileSync(pathname, "utf8");
 							history = JSON.parse(data);
 							if (Array.isArray(history) && history.length !== 0) {
 								fs.writeFileSync(pathname, "[]");
-								await m.reply(from, "berhasil hapus history", id)
-							}else{
-								await m.reply(from, "history kosong..", id)
+								await m.reply(from, "berhasil hapus history", id);
+							} else {
+								await m.reply(from, "history kosong..", id);
 							}
-						}else{
-							await m.reply(from, "Anda tidak terdaftar..", id)
-
+						} else {
+							await m.reply(from, "Anda tidak terdaftar..", id);
 						}
-
 					} catch (error) {
-						log(error)
+						log(error);
 					}
-				
+
 					break;
 				case "b":
 				case "bard":
@@ -729,27 +809,27 @@ module.exports = message = async (m, message, startTime) => {
 								id
 							);
 
-						if(fs.existsSync(pathname)){
-							const data = fs.readFileSync(pathname, 'utf8');
+						if (fs.existsSync(pathname)) {
+							const data = fs.readFileSync(pathname, "utf8");
 							sleep(800);
 							history = await JSON.parse(data);
 							if (Array.isArray(history) && history.length === 0) {
-								await m.sendText(from, `_[pengingat]_\n_history chat mu akan disimpan sementara biar si AI bisa diajak ngobrol.._\n_ketik *${prefix}clearhistory* untuk menghapus history chat dengan AI, dan memulai dengan konteks baru_`)
+								await m.sendText(
+									from,
+									`_[pengingat]_\n_history chat mu akan disimpan sementara biar si AI bisa diajak ngobrol.._\n_ketik *${prefix}clearhistory* untuk menghapus history chat dengan AI, dan memulai dengan konteks baru_`
+								);
 							}
-							log(history.length)
+							log(history.length);
 
 							ai.gemini(teks, chatId)
-							.then(async(res) => {
-								await m.reply(from, res,id);
-							})
-							.catch(async(err) => {
-								await m.reply(from, `duh ada yang error\n${err}`, id)
-							})
-
-
-						}
-						else{
-							log("file not exists")
+								.then(async (res) => {
+									await m.reply(from, res, id);
+								})
+								.catch(async (err) => {
+									await m.reply(from, `duh ada yang error\n${err}`, id);
+								});
+						} else {
+							log("file not exists");
 						}
 						// const genAI = new GoogleGenerativeAI(key.gemini);
 						// const model = genAI.getGenerativeModel({ model: "gemini-pro" });
@@ -1353,7 +1433,7 @@ module.exports = message = async (m, message, startTime) => {
 								"base64"
 							)}`;
 							await m.setGroupIcon(groupId, imageBase64);
-							await m.reply(from, "Berhasil mengubah profile group", id)
+							await m.reply(from, "Berhasil mengubah profile group", id);
 						} else if (args.length === 1) {
 							if (!isUrl(url)) {
 								await m.reply(
@@ -1362,11 +1442,17 @@ module.exports = message = async (m, message, startTime) => {
 									id
 								);
 							}
-							await m.setGroupIconByUrl(groupId, url).then((r) =>
-								!r && r !== undefined
-									? m.reply(from,"Maaf, link yang kamu kirim tidak memuat gambar.",id)
-									: m.reply(from, "Berhasil mengubah profile group", id)
-							);
+							await m
+								.setGroupIconByUrl(groupId, url)
+								.then((r) =>
+									!r && r !== undefined
+										? m.reply(
+												from,
+												"Maaf, link yang kamu kirim tidak memuat gambar.",
+												id
+										  )
+										: m.reply(from, "Berhasil mengubah profile group", id)
+								);
 						} else {
 							m.reply(
 								from,
@@ -1383,179 +1469,215 @@ module.exports = message = async (m, message, startTime) => {
 
 				//////////////////// MENU OWNER ///////////////////////
 				case "kickall":
-							if (!isGroupMsg)
-								return m.reply(
-									from,
-									"Maaf, perintah ini hanya dapat dipakai didalam grup!",
-									id
-								);
-							let isOwner = chat.groupMetadata.owner == pengirim || true ;
-				// log(chat.groupMetadata.owner )
-							if (!isOwner)
-								return m.reply(
-									from,
-									"Maaf, perintah ini hanya dapat dipakai oleh owner grup!",
-									id
-								);
-							if (!isBotGroupAdmins)
-								return m.reply(
-									from,
-									"Gagal, silahkan tambahkan bot sebagai admin grup!",
-									id
-								);
-							const allMem = await m.getGroupMembers(groupId);
-							try {
-					let isAdmins= false;
-								for (let i = 0; i < allMem.length; i++) {
-
-									if (groupAdmins.includes(allMem[i].id)) {
-									// log(allMem[i])
-						isAdmins = true;
-					} else {
-						isAdmins = false;
-										await m.removeParticipant(groupId, allMem[i].id);
-									}
-								}
-					if(!isAdmins){
-					m.reply(from, "Sukses kick semua member", id);
-					}else{
-					m.reply(from, "Gagal, tidak bisa kick admin", id);
-
-					}
-							} catch (error) {
-								console.log(color("ERROR", "red"), err);
-							}
-
-							break;
-				case 'ban':
-				if (!isOwnerBot) return m.reply(from, 'Perintah ini hanya untuk Owner bot!', id)
-				if (args.length == 0) return m.reply(from, `Untuk banned seseorang agar tidak bisa menggunakan commands\n\nCaranya ketik: \n${prefix}ban add 628xx --untuk mengaktifkan\n${prefix}ban del 628xx --untuk nonaktifkan\n\ncara cepat ban banyak digrup ketik:\n${prefix}ban @tag @tag @tag`, id)
-				try {
-					
-					
-					if (args[0] === 'add') {
-						if (mentionedJidList.length !== 0) {
-							for (let benet of mentionedJidList) {
-								if (benet === botNumber) return await m.reply(from, ind.wrongFormat(), id)
-								banned.push(benet)
-								fs.writeFileSync('./settings/banned.json', JSON.stringify(banned))
-							}
-							await m.reply(from, 'Mampus gua ban lu anjg!', id)
-						} else {
-							banned.push(args[1] + '@c.us')
-							fs.writeFileSync('./settings/banned.json', JSON.stringify(banned))
-							await m.reply(from, 'Mampus gua ban lu anjg!', id)
-						}
-					} else if (args[0] === 'del') {
-						if (mentionedJidList.length !== 0) {
-							if (mentionedJidList[0] === botNumber) return await m.reply(from, ind.wrongFormat(), id)
-							banned.splice(mentionedJidList[0], 1)
-							fs.writeFileSync('./settings/banned.json', JSON.stringify(banned))
-							await m.reply(from, 'Nih gua udh unbaned!', id)
-						} else {
-							banned.splice(args[1] + '@c.us', 1)
-							fs.writeFileSync('./settings/banned.json', JSON.stringify(banned))
-							await m.reply(from, 'Nih gua udh unbaned!', id)
-						}
-					} else {
-						await m.reply(from, ind.wrongFormat(), id)
-					}
-				} catch (error) {
-					log(color('err', 'red'),error);
-				}
-				break
-				case 'bc': //untuk broadcast atau promosi
-				
-				try {
-					if (!isOwnerBot) return m.reply(from, 'Perintah ini hanya untuk Owner bot!', id)
-					if (isTeks) return m.reply(from, `Untuk broadcast ke semua chat ketik:\n${prefix}bc [isi chat]`, id)
-					let msg = body.slice(4)
-					const chatz = await m.getAllChatIds()
-					// log(chatz)
-					for (let idk of chatz) {
-						var cvk = await m.getChatById(idk)
-						log(idk)
-						// if (!cvk.isReadOnly) m.sendText(idk, `${msg}`)
-						// if (cvk.isReadOnly) m.sendText(idk, `${msg}`)
-						await sleep(1000)
-					}
-					log(color("[SUCCES]", "green"),"sending broadcast")
-					await m.reply(from, 'Broadcast Success!', id)
-				} catch (error) {
-					console.log(error)
-				}
-				break;
-				case "unblock":
-				if(isTeks) return await m.reply(from, `ketik ${prefix}unblock <nomor tujuan> \ncontoh: *${prefix}unblock* 628888888`);
-
-				try {
-					banned.splice(args[0] + '@c.us', 1);
-					await m.contactUnblock(args[0] + '@c.us');
-					fs.writeFileSync('./settings/banned.json', JSON.stringify(banned));
-
-					await m.reply(from, 'done', id);
-
-				} catch (error) {
-					console.log(color("ERROR", "red"),error)
-				}
-
-				break;
-				case 'addupdate':
-				try {
-					log(isTeks)
-						if (!isOwnerBot) return m.reply(from, 'Maaf, perintah ini hanya dapat dipakai oleh owner!', id)
-						if(isTeks) return m.reply(from, `berikan keterangan update.\ncontoh *${prefix}addupdate* buat fitur blablabla`, id);
-						const update = body.slice(10)
-						updateBot.push(update)
-						fs.writeFileSync('./settings/update.json', JSON.stringify(updateBot))
-						m.reply(from, `Sukses menambahkan update :)`, id)
-					
-				} catch (error) {
-					console.log(color("ERROR", 'red'),error);
-				}
-				break;
-				case 'update': 
+					if (!isGroupMsg)
+						return m.reply(
+							from,
+							"Maaf, perintah ini hanya dapat dipakai didalam grup!",
+							id
+						);
+					let isOwner = chat.groupMetadata.owner == pengirim || true;
+					// log(chat.groupMetadata.owner )
+					if (!isOwner)
+						return m.reply(
+							from,
+							"Maaf, perintah ini hanya dapat dipakai oleh owner grup!",
+							id
+						);
+					if (!isBotGroupAdmins)
+						return m.reply(
+							from,
+							"Gagal, silahkan tambahkan bot sebagai admin grup!",
+							id
+						);
+					const allMem = await m.getGroupMembers(groupId);
 					try {
-					const updaterr = updateBot
-					let updatee = `╔══✪〘 *List Update* 〙✪══\n`
-					for (let i = 0; i < updaterr.length; i++) {
-						updatee += '╠➥'
-						updatee += ` ${updaterr[i]}\n`
-					}
-					updatee += '╚═〘 *Bot* 〙'
-					await m.sendText(from, updatee)
+						let isAdmins = false;
+						for (let i = 0; i < allMem.length; i++) {
+							if (groupAdmins.includes(allMem[i].id)) {
+								// log(allMem[i])
+								isAdmins = true;
+							} else {
+								isAdmins = false;
+								await m.removeParticipant(groupId, allMem[i].id);
+							}
+						}
+						if (!isAdmins) {
+							m.reply(from, "Sukses kick semua member", id);
+						} else {
+							m.reply(from, "Gagal, tidak bisa kick admin", id);
+						}
 					} catch (error) {
-					console.log(color("ERROR", 'red'),error);
-					
+						console.log(color("ERROR", "red"), err);
 					}
-				break;
-				case 'leaveall': //mengeluarkan bot dari semua group serta menghapus chatnya
-				try {
-				if (!isOwnerBot) return m.reply(from, 'Perintah ini hanya untuk Owner bot', id)
-				const allChatz = await m.getAllChatIds()
-				const allGroupz = await m.getAllGroups()
-				// log(allChatz)
-				for (let gclist of allGroupz) {
-					// log(gclist)
-					// await m.sendText(gclist.contact.id, `Maaf bot sedang pembersihan, total chat aktif : ${allChatz.length}`)
-					await m.leaveGroup(gclist.contact.id)
-					await m.deleteChat(gclist.contact.id)
-				}
-				m.reply(from, 'Success leave all group!', id)
-				} catch (error) {
-				console.log(color("ERROR", 'red'),error);
-				
-				}
-				break
-				case 'clearall': //menghapus seluruh pesan diakun bot
-            if (!isOwnerBot) return m.reply(from, 'Perintah ini hanya untuk Owner bot', id)
-            const allChatx = await m.getAllChats()
-            for (let dchat of allChatx) {
-                await m.deleteChat(dchat.id)
-            }
-            m.reply(from, 'Success clear all chat!', id)
-            break
-          		
+
+					break;
+				case "ban":
+					if (!isOwnerBot)
+						return m.reply(from, "Perintah ini hanya untuk Owner bot!", id);
+					if (args.length == 0)
+						return m.reply(
+							from,
+							`Untuk banned seseorang agar tidak bisa menggunakan commands\n\nCaranya ketik: \n${prefix}ban add 628xx --untuk mengaktifkan\n${prefix}ban del 628xx --untuk nonaktifkan\n\ncara cepat ban banyak digrup ketik:\n${prefix}ban @tag @tag @tag`,
+							id
+						);
+					try {
+						if (args[0] === "add") {
+							if (mentionedJidList.length !== 0) {
+								for (let benet of mentionedJidList) {
+									if (benet === botNumber)
+										return await m.reply(from, ind.wrongFormat(), id);
+									banned.push(benet);
+									fs.writeFileSync(
+										"./settings/banned.json",
+										JSON.stringify(banned)
+									);
+								}
+								await m.reply(from, "Mampus gua ban lu anjg!", id);
+							} else {
+								banned.push(args[1] + "@c.us");
+								fs.writeFileSync(
+									"./settings/banned.json",
+									JSON.stringify(banned)
+								);
+								await m.reply(from, "Mampus gua ban lu anjg!", id);
+							}
+						} else if (args[0] === "del") {
+							if (mentionedJidList.length !== 0) {
+								if (mentionedJidList[0] === botNumber)
+									return await m.reply(from, ind.wrongFormat(), id);
+								banned.splice(mentionedJidList[0], 1);
+								fs.writeFileSync(
+									"./settings/banned.json",
+									JSON.stringify(banned)
+								);
+								await m.reply(from, "Nih gua udh unbaned!", id);
+							} else {
+								banned.splice(args[1] + "@c.us", 1);
+								fs.writeFileSync(
+									"./settings/banned.json",
+									JSON.stringify(banned)
+								);
+								await m.reply(from, "Nih gua udh unbaned!", id);
+							}
+						} else {
+							await m.reply(from, ind.wrongFormat(), id);
+						}
+					} catch (error) {
+						log(color("err", "red"), error);
+					}
+					break;
+				case "bc": //untuk broadcast atau promosi
+					try {
+						if (!isOwnerBot)
+							return m.reply(from, "Perintah ini hanya untuk Owner bot!", id);
+						if (isTeks)
+							return m.reply(
+								from,
+								`Untuk broadcast ke semua chat ketik:\n${prefix}bc [isi chat]`,
+								id
+							);
+						let msg = body.slice(4);
+						const chatz = await m.getAllChatIds();
+						// log(chatz)
+						for (let idk of chatz) {
+							var cvk = await m.getChatById(idk);
+							log(idk);
+							// if (!cvk.isReadOnly) m.sendText(idk, `${msg}`)
+							// if (cvk.isReadOnly) m.sendText(idk, `${msg}`)
+							await sleep(1000);
+						}
+						log(color("[SUCCES]", "green"), "sending broadcast");
+						await m.reply(from, "Broadcast Success!", id);
+					} catch (error) {
+						console.log(error);
+					}
+					break;
+				case "unblock":
+					if (isTeks)
+						return await m.reply(
+							from,
+							`ketik ${prefix}unblock <nomor tujuan> \ncontoh: *${prefix}unblock* 628888888`
+						);
+
+					try {
+						banned.splice(args[0] + "@c.us", 1);
+						await m.contactUnblock(args[0] + "@c.us");
+						fs.writeFileSync("./settings/banned.json", JSON.stringify(banned));
+
+						await m.reply(from, "done", id);
+					} catch (error) {
+						console.log(color("ERROR", "red"), error);
+					}
+
+					break;
+				case "addupdate":
+					try {
+						log(isTeks);
+						if (!isOwnerBot)
+							return m.reply(
+								from,
+								"Maaf, perintah ini hanya dapat dipakai oleh owner!",
+								id
+							);
+						if (isTeks)
+							return m.reply(
+								from,
+								`berikan keterangan update.\ncontoh *${prefix}addupdate* buat fitur blablabla`,
+								id
+							);
+						const update = body.slice(10);
+						updateBot.push(update);
+						fs.writeFileSync(
+							"./settings/update.json",
+							JSON.stringify(updateBot)
+						);
+						m.reply(from, `Sukses menambahkan update :)`, id);
+					} catch (error) {
+						console.log(color("ERROR", "red"), error);
+					}
+					break;
+				case "update":
+					try {
+						const updaterr = updateBot;
+						let updatee = `╔══✪〘 *List Update* 〙✪══\n`;
+						for (let i = 0; i < updaterr.length; i++) {
+							updatee += "╠➥";
+							updatee += ` ${updaterr[i]}\n`;
+						}
+						updatee += "╚═〘 *Bot* 〙";
+						await m.sendText(from, updatee);
+					} catch (error) {
+						console.log(color("ERROR", "red"), error);
+					}
+					break;
+				case "leaveall": //mengeluarkan bot dari semua group serta menghapus chatnya
+					try {
+						if (!isOwnerBot)
+							return m.reply(from, "Perintah ini hanya untuk Owner bot", id);
+						const allChatz = await m.getAllChatIds();
+						const allGroupz = await m.getAllGroups();
+						// log(allChatz)
+						for (let gclist of allGroupz) {
+							// log(gclist)
+							// await m.sendText(gclist.contact.id, `Maaf bot sedang pembersihan, total chat aktif : ${allChatz.length}`)
+							await m.leaveGroup(gclist.contact.id);
+							await m.deleteChat(gclist.contact.id);
+						}
+						m.reply(from, "Success leave all group!", id);
+					} catch (error) {
+						console.log(color("ERROR", "red"), error);
+					}
+					break;
+				case "clearall": //menghapus seluruh pesan diakun bot
+					if (!isOwnerBot)
+						return m.reply(from, "Perintah ini hanya untuk Owner bot", id);
+					const allChatx = await m.getAllChats();
+					for (let dchat of allChatx) {
+						await m.deleteChat(dchat.id);
+					}
+					m.reply(from, "Success clear all chat!", id);
+					break;
+
 				/////////////////// MENU MEDIA //////////////////
 				case "ig":
 					if (isTeks)
@@ -1605,46 +1727,49 @@ module.exports = message = async (m, message, startTime) => {
 					break;
 
 				case "ytmp3":
+					sayMaintenance(from,id);
 					break;
 				case "ytmp4":
-					if (isTeks)
-						return m.reply(
-							from,
-							`Download audio dari yt.\n\nContoh:\n${prefix}ytmp3 (link youtube)`,
-							id
-						);
-					// log(teks);
-					const ytmp4 = {
-						method: "GET",
-						url: "https://social-media-video-downloader.p.rapidapi.com/smvd/get/youtube",
-						params: {
-							url: "https://youtu.be/9kH_p8FhBZI",
-						},
-						headers: {
-							"x-rapidapi-key":
-								"766d24ccc8msh20c3ff3132d20fep1e10fajsnc931cbce4d46",
-							"x-rapidapi-host": "social-media-video-downloader.p.rapidapi.com",
-						},
-					};
-					try {
-						// await m.sendImage(from , "", "vidio.mp4", "", id)
-						// const response = await axios.request(ytmp4);
-						// // console.log(response.statusCode);
-						// if (response.data?.error == true)
-						//   throw new Error(response.data?.error_message);
-						// if (response.status == 200) m.reply(from, `sedang diproses 🚀`, id);
-						// if (response.status != 200) throw new Error();
-						// log(response.data.links);
-						// await response.data?.links.forEach(async (e) => {
-						//   if(e.quality == "video_hd_480p (only_video)"){
-						//    await m.sendImage(from, e.link, "d.mp4", "", id);
-						//   }
-						// })
-						// await m.sendAudio(from, response.data.audio_high, id);
-					} catch (error) {
-						await m.reply(from, "proses gagal ☠", id);
-						console.log(color("ERROR", "red"), error);
-					}
+					sayMaintenance(from, id);
+
+					// if (isTeks)
+					// 	return m.reply(
+					// 		from,
+					// 		`Download audio dari yt.\n\nContoh:\n${prefix}ytmp3 (link youtube)`,
+					// 		id
+					// 	);
+					// // log(teks);
+					// const ytmp4 = {
+					// 	method: "GET",
+					// 	url: "https://social-media-video-downloader.p.rapidapi.com/smvd/get/youtube",
+					// 	params: {
+					// 		url: "https://youtu.be/9kH_p8FhBZI",
+					// 	},
+					// 	headers: {
+					// 		"x-rapidapi-key":
+					// 			"766d24ccc8msh20c3ff3132d20fep1e10fajsnc931cbce4d46",
+					// 		"x-rapidapi-host": "social-media-video-downloader.p.rapidapi.com",
+					// 	},
+					// };
+					// try {
+					// 	// await m.sendImage(from , "", "vidio.mp4", "", id)
+					// 	// const response = await axios.request(ytmp4);
+					// 	// // console.log(response.statusCode);
+					// 	// if (response.data?.error == true)
+					// 	//   throw new Error(response.data?.error_message);
+					// 	// if (response.status == 200) m.reply(from, `sedang diproses 🚀`, id);
+					// 	// if (response.status != 200) throw new Error();
+					// 	// log(response.data.links);
+					// 	// await response.data?.links.forEach(async (e) => {
+					// 	//   if(e.quality == "video_hd_480p (only_video)"){
+					// 	//    await m.sendImage(from, e.link, "d.mp4", "", id);
+					// 	//   }
+					// 	// })
+					// 	// await m.sendAudio(from, response.data.audio_high, id);
+					// } catch (error) {
+					// 	await m.reply(from, "proses gagal ☠", id);
+					// 	console.log(color("ERROR", "red"), error);
+					// }
 
 					break;
 				case "tkmp3":
@@ -1726,7 +1851,6 @@ module.exports = message = async (m, message, startTime) => {
 
 					break;
 
-		
 				////////////////////////// MENU USER ///////////////////////////////
 				case "reqfitur":
 					if (args.length == 0)
@@ -1846,329 +1970,398 @@ module.exports = message = async (m, message, startTime) => {
 
 					break;
 				case "join":
-							if (args.length == 0)
+					if (args.length == 0)
+						return m.reply(
+							from,
+							`Jika kalian ingin mengundang bot kegroup silahkan invite atau dengan\nketik ${prefix}join [link group]`,
+							id
+						);
+					let linkgrup = body.slice(6);
+					let islink = linkgrup.match(/(https:\/\/chat.whatsapp.com)/gi);
+					// log(linkgrup)
+					let chekgrup = await m.inviteInfo(linkgrup);
+					if (!islink)
+						return m.reply(
+							from,
+							"Maaf link group-nya salah! silahkan kirim link yang benar",
+							id
+						);
+					try {
+						if (isOwnerBot) {
+							await m.joinGroupViaLink(linkgrup).then(async () => {
+								await m.sendText(from, "Berhasil join grup via link!");
+								await m.sendText(
+									chekgrup.id,
+									`Hi all~, Im mbot. Untuk Memulai Bot silahkan ketik  ${prefix}menu`
+								);
+							});
+						} else {
+							let cgrup = await m.getAllGroups();
+							if (cgrup.length > groupLimit)
 								return m.reply(
 									from,
-									`Jika kalian ingin mengundang bot kegroup silahkan invite atau dengan\nketik ${prefix}join [link group]`,
+									`Sorry, the group on this bot is full\nMax Group is: ${groupLimit}`,
 									id
 								);
-							let linkgrup = body.slice(6);
-							let islink = linkgrup.match(/(https:\/\/chat.whatsapp.com)/gi);
-							// log(linkgrup)
-							let chekgrup = await m.inviteInfo(linkgrup);
-							if (!islink)
+							await m.sendContact(from, ownerNumber);
+							if (cgrup.size < memberLimit)
 								return m.reply(
 									from,
-									"Maaf link group-nya salah! silahkan kirim link yang benar",
+									`Apanih member dikit bat ngentot ${memberLimit} people`,
 									id
 								);
-							try {
-								if (isOwnerBot) {
-									await m.joinGroupViaLink(linkgrup).then(async () => {
-										await m.sendText(from, "Berhasil join grup via link!");
-										await m.sendText(
-											chekgrup.id,
-											`Hi all~, Im mbot. Untuk Memulai Bot silahkan ketik  ${prefix}menu`
-										);
-									});
-								} else {
-									let cgrup = await m.getAllGroups();
-									if (cgrup.length > groupLimit)
-										return m.reply(
-											from,
-											`Sorry, the group on this bot is full\nMax Group is: ${groupLimit}`,
-											id
-										);
-									await m.sendContact(from, ownerNumber);
-									if (cgrup.size < memberLimit)
-										return m.reply(
-											from,
-											`Apanih member dikit bat ngentot ${memberLimit} people`,
-											id
-										);
-									await m.joinGroupViaLink(linkgrup)
-										.then(async (e) => {
-											console.log(e);
-											await m.reply(from, "Berhasil join grup via link!", id);
-										})
-										.catch(() => {
-											m.reply(from, "Gagal!", id);
-										});
-								}
-							} catch (error) {
-								await m.reply(from, "Error", id);
-								console.log(color("ERR", "red"), error);
-							}
-							break;
-				case "botstat":
-
-				try {
-					const loadedMsg = await m.getAmountOfLoadedMessages()
-					const chatIds = await m.getAllChatIds()
-					const groups = await m.getAllGroups()
-					m.sendText(from, `Status :\n- *${loadedMsg}* Loaded Messages\n- *${groups.length}* Group Chats\n- *${chatIds.length - groups.length}* Personal Chats\n- *${chatIds.length}* Total Chats`)
-					
-				} catch (error) {
-					console.log(color("ERROR", 'red'), error)
-				}
-				break;
-				case 'ping':
-				await m.sendText(from, `Pong!!!!\nSpeed: ${processTime(t, moment())} _Second_`)
-				break     
-				case "creategroup":
-				if(isTeks) return await m.reply(from , 'w',id);
-
-				try {
-					log(botNumber, sender.id)
-					
-					const gcname = teks
-					await m.createGroup(gcname, "6282353585277@c.us").then(async(e) => {
-						log("err",e)
-						await m.sendText(from, `Sukses membuat grup`, id)
-					})
-				
-					// log(gcname)
-
-					// await m.reply(from, `berhasil membuat group ${teks}`, id)
-				} catch (error) {
-					log(error);
-				}
-				break;
-				case 'mystat': {
-					const userid = sender.id
-					const ban = banned.includes(userid)
-					const blocked = await m.getBlockedIds()
-					const isblocked = blocked.includes(userid)
-					const ct = await m.getContact(userid)
-					const isOnline = await m.isChatOnline(userid) ? '✔' : '❌'
-					var sts = await m.getStatus(userid)
-					const bio = sts
-					const admins = groupAdmins?.includes(userid) ? 'Admin' : 'Member'
-					var found = false
-					Object.keys(pengirim).forEach((i) => {
-						if (pengirim[i].id == userid) {
-							found = i
+							await m
+								.joinGroupViaLink(linkgrup)
+								.then(async (e) => {
+									console.log(e);
+									await m.reply(from, "Berhasil join grup via link!", id);
+								})
+								.catch(() => {
+									m.reply(from, "Gagal!", id);
+								});
 						}
-					})
-					var adm = admins
-				try {
-					if (ct == null) {
-						return await m.reply(from, 'Nomor WhatsApp tidak valid [ Tidak terdaftar di WhatsApp ]', id)
-					} else {
-						const contact = ct.pushname
-						const dp = await m.getProfilePicFromServer(userid)
-						if (dp == undefined) {
-							var pfp = 'https://raw.githubusercontent.com/Gimenz/line-break/master/profil.jpg'
-						} else {
-							var pfp = dp
-						}
-						if (contact == undefined) {
-							var nama = '_Dia pemalu, tidak mau menampilkan namanya_'
-						} else {
-							var nama = contact
-						}
-						const caption = `*Detail Member* ✨ \n\n● *Name :* ${nama}\n● *Bio :* ${bio.status}\n● *Chat link :* wa.me/${sender.id.replace('@c.us', '')}\n● *Role :* ${adm}\n● *Banned by Bot :* ${ban ? '✔' : '❌'}\n● *Blocked by Bot :* ${isblocked ? '✔' : '❌'}\n● *Chat with bot :* ${isOnline} ${ban || isblocked ? `\n\n _you are blocked?_chat the owner_ try:*${prefix}owner* ` : ''}`
-						m.sendFileFromUrl(from, pfp, 'dp.jpg', caption)
+					} catch (error) {
+						await m.reply(from, "Error", id);
+						console.log(color("ERR", "red"), error);
 					}
-				} catch (error) {
-					console.log(color("ERROR", 'red'), error)
-					
-				}
-				}
-					break				
-				case "owner":
-				try {
-					await m.reply(from, `Owner : wa.me/${ownerNumber.replace('@c.us', '')}`, id)
-					
-				} catch (error) {
-					console.log(color("ERROR", 'red'), error)
-					
-				}
 					break;
-				
-				case "p":
-				await m.sendText(from, 'ini pesan akan hilang dalam 24 jam', {
-					disappearingMessagesInChat: 86400 
-				})
-				break;
+				case "botstat":
+					try {
+						const loadedMsg = await m.getAmountOfLoadedMessages();
+						const chatIds = await m.getAllChatIds();
+						const groups = await m.getAllGroups();
+						m.sendText(
+							from,
+							`Status :\n- *${loadedMsg}* Loaded Messages\n- *${
+								groups.length
+							}* Group Chats\n- *${
+								chatIds.length - groups.length
+							}* Personal Chats\n- *${chatIds.length}* Total Chats`
+						);
+					} catch (error) {
+						console.log(color("ERROR", "red"), error);
+					}
+					break;
+				case "ping":
+					await m.sendText(
+						from,
+						`Pong!!!!\nSpeed: ${processTime(t, moment())} _Second_`
+					);
+					break;
+				case "creategroup":
+					if (isTeks) return await m.reply(from, "w", id);
 
+					try {
+						log(botNumber, sender.id);
+
+						const gcname = teks;
+						await m
+							.createGroup(gcname, "6282353585277@c.us")
+							.then(async (e) => {
+								log("err", e);
+								await m.sendText(from, `Sukses membuat grup`, id);
+							});
+
+						// log(gcname)
+
+						// await m.reply(from, `berhasil membuat group ${teks}`, id)
+					} catch (error) {
+						log(error);
+					}
+					break;
+				case "mystat":
+					{
+						const userid = sender.id;
+						const ban = banned.includes(userid);
+						const blocked = await m.getBlockedIds();
+						const isblocked = blocked.includes(userid);
+						const ct = await m.getContact(userid);
+						const isOnline = (await m.isChatOnline(userid)) ? "✔" : "❌";
+						var sts = await m.getStatus(userid);
+						const bio = sts;
+						const admins = groupAdmins?.includes(userid) ? "Admin" : "Member";
+						var found = false;
+						Object.keys(pengirim).forEach((i) => {
+							if (pengirim[i].id == userid) {
+								found = i;
+							}
+						});
+						var adm = admins;
+						try {
+							if (ct == null) {
+								return await m.reply(
+									from,
+									"Nomor WhatsApp tidak valid [ Tidak terdaftar di WhatsApp ]",
+									id
+								);
+							} else {
+								const contact = ct.pushname;
+								const dp = await m.getProfilePicFromServer(userid);
+								if (dp == undefined) {
+									var pfp =
+										"https://raw.githubusercontent.com/Gimenz/line-break/master/profil.jpg";
+								} else {
+									var pfp = dp;
+								}
+								if (contact == undefined) {
+									var nama = "_Dia pemalu, tidak mau menampilkan namanya_";
+								} else {
+									var nama = contact;
+								}
+								const caption = `*Detail Member* ✨ \n\n● *Name :* ${nama}\n● *Bio :* ${
+									bio.status
+								}\n● *Chat link :* wa.me/${sender.id.replace(
+									"@c.us",
+									""
+								)}\n● *Role :* ${adm}\n● *Banned by Bot :* ${
+									ban ? "✔" : "❌"
+								}\n● *Blocked by Bot :* ${
+									isblocked ? "✔" : "❌"
+								}\n● *Chat with bot :* ${isOnline} ${
+									ban || isblocked
+										? `\n\n _you are blocked?_chat the owner_ try:*${prefix}owner* `
+										: ""
+								}`;
+								m.sendFileFromUrl(from, pfp, "dp.jpg", caption);
+							}
+						} catch (error) {
+							console.log(color("ERROR", "red"), error);
+						}
+					}
+					break;
+				case "owner":
+					try {
+						await m.reply(
+							from,
+							`Owner : wa.me/${ownerNumber.replace("@c.us", "")}`,
+							id
+						);
+					} catch (error) {
+						console.log(color("ERROR", "red"), error);
+					}
+					break;
+
+				case "p":
+					await m.sendText(from, "ini pesan akan hilang dalam 24 jam", {
+						disappearingMessagesInChat: 86400,
+					});
+					break;
 
 				///////////////////// MENU HIBURAN ////////////////////////
 				case "cekhodam":
 				case "cekkhodam":
-				if(isTeks) return await m.reply(from , `cek khodam kamu dengan cara *${prefix}cekkhodam [namakamu]*\ncontoh: *${prefix}cekkhodam ujang*`, id);
-				try {
-					const khodammu = fun.cekKhodam() 
-					await m.reply(from, `*Nama: ${teks}*\n*Khodam: ${khodammu}*`,id);
+					if (isTeks)
+						return await m.reply(
+							from,
+							`cek khodam kamu dengan cara *${prefix}cekkhodam [namakamu]*\ncontoh: *${prefix}cekkhodam ujang*`,
+							id
+						);
+					try {
+						const khodammu = fun.cekKhodam();
+						await m.reply(from, `*Nama: ${teks}*\n*Khodam: ${khodammu}*`, id);
+					} catch (error) {
+						console.log(color("ERROR", "red"), error);
+					}
+					break;
 
-
-				} catch (error) {
-					console.log(color("ERROR", 'red'), error)
-					
-				}
-				break;
-				
 				case "spotify":
-				if(isTeks) return await m.reply(from , `cari track song di spotify dengan cara *${prefix}spotify [keyword]*\ncontoh: *${prefix}spotify evaluasi*`,id);
-				try {
-					// log(teks)
-					fun.spotifySearch(teks)
-					.then(async(res) => {
-					// log(res)
-					const caption = `🏷 : ${res.name}\n🔗 : ${res.shareUrl}\n⌛ : ${res.duration}`;
-					await m.sendImage(from, res.coverUrl, 'results.png', caption, id);
-
-
-					})
-					.catch(async(err) => {
-					await m.reply(from, 'gagal',id)
-					console.log(color("ERROR", 'red'),err)
-					})
-				} catch (error) {
-					console.log(color("ERROR", 'red'),error)
-				}  
-				break;
+					if (isTeks)
+						return await m.reply(
+							from,
+							`cari track song di spotify dengan cara *${prefix}spotify [keyword]*\ncontoh: *${prefix}spotify evaluasi*`,
+							id
+						);
+					try {
+						// log(teks)
+						fun
+							.spotifySearch(teks)
+							.then(async (res) => {
+								// log(res)
+								const caption = `🏷 : ${res.name}\n🔗 : ${res.shareUrl}\n⌛ : ${res.duration}`;
+								await m.sendImage(
+									from,
+									res.coverUrl,
+									"results.png",
+									caption,
+									id
+								);
+							})
+							.catch(async (err) => {
+								await m.reply(from, "gagal", id);
+								console.log(color("ERROR", "red"), err);
+							});
+					} catch (error) {
+						console.log(color("ERROR", "red"), error);
+					}
+					break;
 				case "linkedln":
-				if(isTeks) return await m.reply(from , `cari Job di Linkedln dengan cara *${prefix}linkedln [job-search] [kuantitas]*\ncontoh: *${prefix}linkedln fullstack-dev 5* \n*WAJIB PAKEK STRIP (-)  `,id);
-				try {
-					const jobQ=args[0].split("-").join(' ');
-					log(jobQ)
-					const quantity = args[1];
-					if (isNaN(quantity)) return await m.reply(from, `parameter kedua harus berupa angka!!\ncontoh: *${prefix}linkedln fullstack-dev 5* \n*WAJIB PAKEK STRIP (-)`, id);
-					await m.reply(from, `mencari job ${jobQ} ~~`,id)
-					fun.linkedln(jobQ , quantity)
-					.then(async(res) => {
-					// log(res)
-					res.map(async(e) => {
-						const desc = truncateText(e.jobdesc, 250);
-						const text = `*Title* : ${e.title}\n*Company* : ${e.companyName}\n*location* : ${e.location}\n*Industries* : ${e.industries}\n*Url* : ${e.url}\n*JobDesc* : ${desc}`
-						await m.sendText(from, text);
-						// log(desc);
-					})
+					if (isTeks)
+						return await m.reply(
+							from,
+							`cari Job di Linkedln dengan cara *${prefix}linkedln [job-search] [kuantitas]*\ncontoh: *${prefix}linkedln fullstack-dev 5* \n*WAJIB PAKEK STRIP (-)  `,
+							id
+						);
+					try {
+						const jobQ = args[0].split("-").join(" ");
+						log(jobQ);
+						const quantity = args[1];
+						if (isNaN(quantity))
+							return await m.reply(
+								from,
+								`parameter kedua harus berupa angka!!\ncontoh: *${prefix}linkedln fullstack-dev 5* \n*WAJIB PAKEK STRIP (-)`,
+								id
+							);
+						await m.reply(from, `mencari job ${jobQ} ~~`, id);
+						fun
+							.linkedln(jobQ, quantity)
+							.then(async (res) => {
+								// log(res)
+								res.map(async (e) => {
+									const desc = truncateText(e.jobdesc, 250);
+									const text = `*Title* : ${e.title}\n*Company* : ${e.companyName}\n*location* : ${e.location}\n*Industries* : ${e.industries}\n*Url* : ${e.url}\n*JobDesc* : ${desc}`;
+									await m.sendText(from, text);
+									// log(desc);
+								});
+							})
+							.catch((err) => {
+								console.log(color("ERROR", "red"), err);
+							});
+					} catch (error) {
+						console.log(color("ERROR", "red"), error);
+					}
 
-					})
-					.catch(err => {
-
-					console.log(color("ERROR", 'red'),err)
-					})
-
-
-				} catch (error) {
-					console.log(color("ERROR", 'red'),error)
-					
-				}
-				
-				break;
+					break;
 				case "pantun":
 					try {
 						await m.reply(from, fun.getPantun(), id);
 					} catch (error) {
-						
-					console.log(color("ERROR", 'red'),error)
+						console.log(color("ERROR", "red"), error);
 					}
 					break;
-				case 'fakta':
+				case "fakta":
 					try {
-						
-					fetch('https://raw.githubusercontent.com/ArugaZ/grabbed-results/main/random/faktaunix.txt')
-						.then(res => res.text())
-						.then(body => {
-							let splitnix = body.split('\n')
-							let randomnix = splitnix[Math.floor(Math.random() * splitnix.length)]
-							m.reply(from, randomnix, id)
-						})
-						.catch(() => {
-							m.reply(from, 'Ada yang Error!', id)
-						})
-						
+						fetch(
+							"https://raw.githubusercontent.com/ArugaZ/grabbed-results/main/random/faktaunix.txt"
+						)
+							.then((res) => res.text())
+							.then((body) => {
+								let splitnix = body.split("\n");
+								let randomnix =
+									splitnix[Math.floor(Math.random() * splitnix.length)];
+								m.reply(from, randomnix, id);
+							})
+							.catch(() => {
+								m.reply(from, "Ada yang Error!", id);
+							});
 					} catch (error) {
-					console.log(color("ERROR", 'red'),error)
-						
+						console.log(color("ERROR", "red"), error);
 					}
 					break;
-				case 'katabijak':
-					fetch('https://raw.githubusercontent.com/ArugaZ/grabbed-results/main/random/katabijax.txt')
-						.then(res => res.text())
-						.then(body => {
-							let splitbijak = body.split('\n')
-							let randombijak = splitbijak[Math.floor(Math.random() * splitbijak.length)]
-							m.reply(from, randombijak, id)
+				case "katabijak":
+					fetch(
+						"https://raw.githubusercontent.com/ArugaZ/grabbed-results/main/random/katabijax.txt"
+					)
+						.then((res) => res.text())
+						.then((body) => {
+							let splitbijak = body.split("\n");
+							let randombijak =
+								splitbijak[Math.floor(Math.random() * splitbijak.length)];
+							m.reply(from, randombijak, id);
 						})
 						.catch(() => {
-							m.reply(from, 'Ada yang Error!', id)
-						})
-					break
+							m.reply(from, "Ada yang Error!", id);
+						});
+					break;
 
 				case "cekresi":
-					if(isTeks) return await m.reply(from, `lacak paket mu dengan resi..\nusage : *${prefix}cekresi [kurir] [nomor resi]*\ncontoh: *${prefix}cekresi jnt 582230008329223*\n\nuntuk lihat daftar kurir yang tersedia bisa ketik *${prefix}kurir*`, id)
-					const kurir = args[0].toLowerCase()
-					const resi = args[1]
-					if(filetype.courier[kurir] !== undefined && !isNaN(resi)){
-						log(kurir, resi)
-						fun.cekResi(resi,  kurir)
-						.then(async(res) => {
-							// log(res)
-							const courier = res.summary.courier ? res.summary.courier : '';
-							const status =res.summary.status ? res.summary.status: '';
-							const date = res.summary.date;
-							const origin =res.detail.origin
-							const destination = res.detail.destination;
-							let historye = '*[HISTORY]*\n'
-							res.history.map((item, i) => {
-								historye += `${item.date}\n${item.desc}\n\n`
-							})
-							const results = `*[DETAIL]*\nkurir : ${courier}\nStatus : ${status}\nWaktu : ${date}\nDari : ${origin}\nKe : ${destination}\n\n${historye}`
+					if (isTeks)
+						return await m.reply(
+							from,
+							`lacak paket mu dengan resi..\nusage : *${prefix}cekresi [kurir] [nomor resi]*\ncontoh: *${prefix}cekresi jnt 582230008329223*\n\nuntuk lihat daftar kurir yang tersedia bisa ketik *${prefix}kurir*`,
+							id
+						);
+					const kurir = args[0].toLowerCase();
+					const resi = args[1];
+					if (filetype.courier[kurir] !== undefined && !isNaN(resi)) {
+						log(kurir, resi);
+						fun
+							.cekResi(resi, kurir)
+							.then(async (res) => {
+								// log(res)
+								const courier = res.summary.courier ? res.summary.courier : "";
+								const status = res.summary.status ? res.summary.status : "";
+								const date = res.summary.date;
+								const origin = res.detail.origin;
+								const destination = res.detail.destination;
+								let historye = "*[HISTORY]*\n";
+								res.history.map((item, i) => {
+									historye += `${item.date}\n${item.desc}\n\n`;
+								});
+								const results = `*[DETAIL]*\nkurir : ${courier}\nStatus : ${status}\nWaktu : ${date}\nDari : ${origin}\nKe : ${destination}\n\n${historye}`;
 
-							await m.reply(from, results, id);
-						})
-						.catch(err => {
-							log(err)
-						})
-					}else{
-						await m.reply(from, 'format salah', id);
+								await m.reply(from, results, id);
+							})
+							.catch((err) => {
+								log(err);
+							});
+					} else {
+						await m.reply(from, "format salah", id);
 					}
 					break;
 				case "kurir":
-					
-					
 					try {
-						let tekes = ""
+						let tekes = "";
 						for (const [key] of Object.entries(filetype.courier)) {
-							
-							tekes += `${key}\n`
-						}	
-						await m.reply(from, tekes, id)				  
-						
-					} catch (error) {
-						
-					}
+							tekes += `${key}\n`;
+						}
+						await m.reply(from, tekes, id);
+					} catch (error) {}
 					break;
 				case "translate":
+					sayMaintenance(from, id);
+
 					break;
 				case "artinama":
+					sayMaintenance(from, id);
 					break;
 				case "igs":
+					sayMaintenance(from, id);
+
 					break;
 				case "Alaudio":
+					sayMaintenance(from, id);
+
 					break;
 				case "tafsir":
+					sayMaintenance(from, id);
+
 					break;
 				case "surah":
+					sayMaintenance(from, id);
+
 					break;
 				case "infosurah":
+					sayMaintenance(from, id);
+
 					break;
 				case "wiki":
+					sayMaintenance(from, id);
+
 					break;
 				case "Alaudio":
+					sayMaintenance(from, id);
+
 					break;
 				case "Alaudio":
+					sayMaintenance(from, id);
+
 					break;
 				case "Alaudio":
+					sayMaintenance(from, id);
+
 					break;
 				default:
 					m.reply(from, "saat ini menu belum tersedia", id);
-					console.log("menu tidak ada");
-
 					break;
 			}
 		}
