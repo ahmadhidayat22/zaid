@@ -6,6 +6,9 @@ const options = require('./utils/options')
 const figlet = require('figlet')
 const chalk = require('chalk');
 const { log } = require('console');
+const errorImgg = "https://i.ibb.co/jRCpLfn/user.png";
+const setting = JSON.parse(fs.readFileSync("./settings/setting.json"));
+let { ownerNumber, groupLimit, limitCount, memberLimit, prefix } = setting;
 
 
 
@@ -47,11 +50,11 @@ require('./lib/menu.js')
 require('./lib');
 nocache('./lib/menu.js', module => console.log(`'${module} updated!'`))
 nocache('./lib', module => console.log(`'${module} updated!'`))
-nocache(__filename, module => console.log(`'${module}' Updated!`))
+nocache(__filename , module => console.log(`'${module} updated!'`))
+
 
 function start(client) {
   console.log('\x1Bc')
-
   console.log(color(figlet.textSync('----------------', { horizontalLayout: 'default' })))
   console.log(color(figlet.textSync('Zaid Bot', { font: 'Ghost', horizontalLayout: 'default' })))
   console.log(color(figlet.textSync('----------------', { horizontalLayout: 'default' })))
@@ -63,8 +66,11 @@ function start(client) {
   client.onStateChanged((state) => {
     console.log(color('[~>>]', 'red'), state)
     if (state === 'CONFLICT' || state === 'UNLAUNCHED') client.forceRefocus()
-  })
 
+    
+    if(state==='UNPAIRED') console.log('LOGGED OUT!!!!')
+  })
+ 
   client.onMessage(async (message) => {
     try{
       client.getAmountOfLoadedMessages() // menghapus pesan cache jika sudah 3000 pesan.
@@ -74,17 +80,43 @@ function start(client) {
                       client.cutMsgCache()
                   }
               })
+      
       require('./message')(client, message , startTime)
     }catch(e){
       console.log(color("ERROR", "red"), e);
     }
   });
 
+  client.onIncomingCall(async (callData) => {
+    const banned = JSON.parse(fs.readFileSync("./settings/banned.json"));
+    log(banned)
+    const number = (callData.peerJid).replace(":60", "")
+    // ketika seseorang menelpon nomor bot akan mengirim pesan
+    await client.sendText(number, `Maaf sedang tidak bisa menerima panggilan.\nnelfon = block dan banned\nuntuk membuka silahkan chat owner wa.me/${ownerNumber.replace('@c.us','')} \n\n-bot`)
+        
+            // bot akan memblock nomor itu
+    await client.contactBlock(number)
+    banned.push(number)
+    fs.writeFileSync('./settings/banned.json', JSON.stringify(banned))
+       
+  })
+
+  
+
 }
+
 
 create(options(true, start))
 .then(start)
 .catch(err => {
   console.log(err);
 })
+
+// let file = require.resolve(__filename);
+// fs.watchFile(file, () => {
+//   fs.unwatchFile(file);
+//   console.log(chalk.redBright(`Update ${__filename}`));
+//   delete require.cache[file];
+//   require(file);
+// });
 

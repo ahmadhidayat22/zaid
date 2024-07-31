@@ -13,13 +13,17 @@
     "@open-wa/wa-automate": "^4.71.15",
     "asposewordscloud": "^24.7.0",
     "axios": "^1.7.2",
+    "canvacord": "^5.2.0",
     "chalk": "^4.1.2",
     "cheerio": "^1.0.0-rc.12",
+    "discord-canvas": "^1.5.2",
     "dotenv": "^16.4.5",
     "figlet": "^1.7.0",
     "fs-extra": "^11.2.0",
     "google-translate-open-api": "^1.3.7",
+    "got": "^11.7.0",
     "mathjs": "^13.0.3",
-    "moment-timezone": "^0.5.45"
+    "moment-timezone": "^0.5.45",
+    "node-gtts": "^2.0.2"
   }
 }
