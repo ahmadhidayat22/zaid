@@ -12,6 +12,7 @@ const Math_js = require("mathjs");
 const { Canvacord, Welcomer, Leaver, Rank } = require("canvacord");
 const errorImgg = "https://i.ibb.co/jRCpLfn/user.png";
 const get = require("got");
+const { TiktokDL } = require("@tobyg74/tiktok-api-dl");
 
 const sleep = async (ms) => {
 	return new Promise((resolve) => setTimeout(resolve, ms));
@@ -346,6 +347,9 @@ module.exports = message = async (m, message, startTime) => {
 		const sayMaintenance = async (In, to) => {
 			await m.reply(In, "maaf fitur masih dibuat", to);
 		};
+		const logerr = (error) => {
+			console.log(color("ERROR", 'red'), error)
+		}
 		/////////////////////// QUIZ MTK //////////////////////////////
 
 		if (isGroupMsg) {
@@ -889,40 +893,7 @@ module.exports = message = async (m, message, startTime) => {
 
 					break;
 
-				case "tkmp4":
-					if (isTeks)
-						return m.reply(
-							from,
-							`Download Video from tiktok No watermak.\n\nContoh:\n${prefix}tkmp4 (link vidio tiktok) `,
-							id
-						);
-
-					try {
-						const tiktokApi = {
-							method: "GET",
-							url: "https://tiktok-downloader-download-tiktok-videos-without-watermark.p.rapidapi.com/index",
-							params: {
-								url: teks,
-							},
-							headers: {
-								"X-RapidAPI-Key":
-									"766d24ccc8msh20c3ff3132d20fep1e10fajsnc931cbce4d46",
-								"X-RapidAPI-Host":
-									"tiktok-downloader-download-tiktok-videos-without-watermark.p.rapidapi.com",
-							},
-						};
-						const response = await axios.request(tiktokApi);
-						if (response.status == 200) {
-							await m.sendMessage(mek.key.remoteJid, {
-								video: { url: response.data.video },
-							});
-						} else {
-							m.reply(from, `gagal mendownload\ncoba lagi nanti`, id);
-						}
-					} catch (error) {
-						console.log(color("ERROR", "red"), error);
-					}
-					break;
+				
 
 				case "wordpdf":
 					// console.log(mimetype);
@@ -1772,10 +1743,83 @@ module.exports = message = async (m, message, startTime) => {
 					// }
 
 					break;
-				case "tkmp3":
-					break;
 				case "tkmp4":
+					if (isTeks)
+						return m.reply(
+							from,
+							`Download vidio dari tiktok.\n\nUsage:\n${prefix}tkmp4 (link tiktok) `,
+							id
+						);
+					try {
+						const urlVid = teks
+						
+						const axios = require('axios');
+						const tiktokApi = {
+							method: 'GET',
+							url: 'https://tiktok-downloader-download-tiktok-videos-without-watermark.p.rapidapi.com/index',
+							params: {
+							  url: urlVid
+							},
+							headers: {
+							  'X-RapidAPI-Key': '766d24ccc8msh20c3ff3132d20fep1e10fajsnc931cbce4d46',
+							  'X-RapidAPI-Host': 'tiktok-downloader-download-tiktok-videos-without-watermark.p.rapidapi.com'
+							}
+						  };
+						   const response = await axios.request(tiktokApi);
+						   if (response.status == 200 ) {
+									// response.data.video
+									await m.reply(from,`tunggu sebentar`,id);
+									
+									log(response.data.video[0])
+
+									await m.sendImage(from,response.data.video[0], "tkmp4.mov","",id );
+							} else {
+									m.reply(from,`gagal mendownload\ncoba lagi nanti`,id);
+								};
+								
+					} catch (error) {
+						logerr(error);
+					}
 					break;
+				case "tkmp3":
+					if (isTeks)
+					return m.reply(
+						from,
+						`Download lagu/sound dari tiktok.\n\nUsage:\n${prefix}tkmp3 (link tiktok) `,
+						id
+					);
+					try {
+					
+						const axios = require('axios');
+						const tiktokApi = {
+							method: 'GET',
+							url: 'https://tiktok-downloader-download-tiktok-videos-without-watermark.p.rapidapi.com/index',
+							params: {
+							  url: teks
+							},
+							headers: {
+							  'X-RapidAPI-Key': '766d24ccc8msh20c3ff3132d20fep1e10fajsnc931cbce4d46',
+							  'X-RapidAPI-Host': 'tiktok-downloader-download-tiktok-videos-without-watermark.p.rapidapi.com'
+							}
+						  };
+						   const response = await axios.request(tiktokApi);
+						   if (response.status == 200 ) {
+									// response.data.video
+									await m.reply(from,`tunggu sebentar`,id);
+									
+									// log(response.data.video[0])
+
+									await m.sendAudio(from,response.data.music[0],id );
+
+							} else {
+									m.reply(from,`gagal mendownload\ncoba lagi nanti`,id);
+								};
+
+
+					} catch (error) {
+						logerr(error)
+					}
+					break
 
 				case "fb":
 					if (isTeks)
