@@ -6,6 +6,7 @@ node_modules
 **_IGNORE_**
 
 settings/key.json
+temp/*.json
 
 # end managed
 

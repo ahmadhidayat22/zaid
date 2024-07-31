@@ -61,6 +61,7 @@ function start(client) {
   console.log(color('[DEV]'), color('Zaid', 'green'))
   console.log(color('[~>>]'), color('BOT Started!', 'yellow'))
 
+  client.sendText(ownerNumber, "Bot started!")
   // Mempertahankan sesi agar tetap nyala
 
   client.onStateChanged((state) => {

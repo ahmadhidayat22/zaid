@@ -54,6 +54,8 @@ let { ownerNumber, groupLimit, limitCount, memberLimit, prefix } = setting;
 
 module.exports = message = async (m, message, startTime) => {
 	try {
+		let _user = JSON.parse(fs.readFileSync('./settings/user.json'));
+
     	const banned = JSON.parse(fs.readFileSync("./settings/banned.json"));
 		const timerEasy = 5000;
 		const timerMed = 10000;
@@ -122,8 +124,10 @@ module.exports = message = async (m, message, startTime) => {
 		const isKuis = isGroupMsg ? kuis.includes(chat.id) : false;
 		const isMtk = isGroupMsg ? kuismtk.includes(chat.id) : false;
 		const isMtkk = isGroupMsg ? kuismtkk.includes(chat.id) : false;
-    const checkStat = isCmd && command == 'mystat'? true : false ;
+    	const checkStat = isCmd && command == 'mystat'? true : false ;
 		const isTeks = args.length == 0 ? true : false;
+		const pathname = `./temp/${chatId}.json`;
+
 		// .b hello world [ 'hello' , 'wordl'] [ 'hello' , ' world'] b [ '.b', 'hello' ] hello
 		// console.log(validMessage, arguments, args, argv , argus ,q);
 
@@ -146,89 +150,77 @@ module.exports = message = async (m, message, startTime) => {
 		const originalText = teks;
 		const maxLength = 30;
 		const teks_singkat = truncateText(originalText, maxLength);
+		let _isRegistered = false;
 
 		//   console.log(truncatedText); // Output: "Lorem ipsum dolor sit amet, consectetur adipiscing elit..."
 
 		// [IDENTIFY]
 		const isOwnerBot = ownerNumber.includes(pengirim);
 		const isBanned = banned.includes(pengirim);
+		// log(chat.id, chatId)
+		const SaveUserHistoryAi = async(userdata) => {
 
-		// Log
-		// console.log(message);
-
-		///// all function /////
-		async function imageToWebp(media) {
-			const tmpFileOut = path.join(
-				tmpdir(),
-				`${Crypto.randomBytes(6).readUIntLE(0, 6).toString(36)}.webp`
-			);
-			const tmpFileIn = path.join(
-				tmpdir(),
-				`${Crypto.randomBytes(6).readUIntLE(0, 6).toString(36)}.jpg`
-			);
-
-			fs.writeFileSync(tmpFileIn, media);
-
-			await new Promise((resolve, reject) => {
-				ff(tmpFileIn)
-					.on("error", reject)
-					.on("end", () => resolve(true))
-					.addOutputOptions([
-						"-vcodec",
-						"libwebp",
-						"-vf",
-						"scale='min(320,iw)':min'(320,ih)':force_original_aspect_ratio=decrease,fps=15, pad=320:320:-1:-1:color=white@0.0, split [a][b]; [a] palettegen=reserve_transparent=on:transparency_color=ffffff [p]; [b][p] paletteuse",
-					])
-					.toFormat("webp")
-					.save(tmpFileOut);
-			});
-
-			const buff = fs.readFileSync(tmpFileOut);
-			fs.unlinkSync(tmpFileOut);
-			fs.unlinkSync(tmpFileIn);
-			return buff;
-		}
-		async function writeExifImg(media, metadata) {
-			let wMedia = await imageToWebp(media);
-			const tmpFileIn = path.join(
-				"./",
-				`${Crypto.randomBytes(6).readUIntLE(0, 6).toString(36)}.webp`
-			);
-			const tmpFileOut = path.join(
-				"./",
-				`${Crypto.randomBytes(6).readUIntLE(0, 6).toString(36)}.webp`
-			);
-			fs.writeFileSync(tmpFileIn, wMedia);
-
-			if (metadata.packname || metadata.author) {
-				const img = new webp.Image();
-				const json = {
-					"sticker-pack-id": `https://github.com/DikaArdnt/Hisoka-Morou`,
-					"sticker-pack-name": metadata.packname,
-					"sticker-pack-publisher": metadata.author,
-					emojis: metadata.categories ? metadata.categories : [""],
-				};
-				const exifAttr = Buffer.from([
-					0x49, 0x49, 0x2a, 0x00, 0x08, 0x00, 0x00, 0x00, 0x01, 0x00, 0x41,
-					0x57, 0x07, 0x00, 0x00, 0x00, 0x00, 0x00, 0x16, 0x00, 0x00, 0x00,
-				]);
-				const jsonBuff = Buffer.from(JSON.stringify(json), "utf-8");
-				const exif = Buffer.concat([exifAttr, jsonBuff]);
-				exif.writeUIntLE(jsonBuff.length, 14, 4);
-				await img.load(tmpFileIn);
-				fs.unlinkSync(tmpFileIn);
-				img.exif = exif;
-				await img.save(tmpFileOut);
-				return tmpFileOut;
+			const dir ='./temp';
+			if (!fs.existsSync(dir)){
+				fs.mkdirSync(dir);
 			}
+			try {
+				
+				await userdata.forEach(item => {
+					const filePath = `${dir}/${item}.json`; // Buat nama file berdasarkan ID
+
+					if(fs.existsSync(filePath)){
+						console.log(`File ${filePath} already exists. Skipping.`);
+						return;
+					}
+					// const jsonData = JSON.stringify(item, null, 2); // Konversi data ke format JSON dengan indentsi 2
+			
+					// Tulis data ke file JSON
+					fs.writeFile(filePath, "[]", 'utf8', (err) => {
+						if (err) {
+							console.error(`Error writing file ${filePath}:`, err);
+						} else {
+							console.log(`File ${filePath} has been saved.`);
+						}
+					});
+				});
+					
+			} catch (error) {
+				console.log(color("ERROR", 'red'), error);
+			}
+
 		}
+		const saveUser = async () => {
+			try {
+				if (_user.length === 0) {
+					_isRegistered = true;
+					_user.push(chat.id);
+					await fs.promises.writeFile('./settings/user.json', JSON.stringify(_user, null, 2));
+					await SaveUserHistoryAi(_user);
+					console.log("Success: Added new user data");
+				} else {
+					const isExist = _user.includes(chat.id);
+					if (!isExist) {
+						_user.push(chat.id);
+						_isRegistered = true;
+						await fs.promises.writeFile('./settings/user.json', JSON.stringify(_user, null, 2));
+						await SaveUserHistoryAi(_user);
+						console.log("Success: Saved user data");
+					}
+				}
+			} catch (error) {
+				console.error("Error saving user data:", error);
+			}
+		};
 
 		if (isCmd && !isGroupMsg && !isBanned)
+			
 			console.log(color("[CMD]"),color(time, "yellow"),color(`${prefix}${command} [${teks_singkat}]`),
 				"from",
 				color(pushname)
 			);
 		if (isCmd && isGroupMsg && !isBanned)
+			
 			console.log(
 				color("[CMD]"),
 				color(time, "yellow"),
@@ -523,6 +515,7 @@ module.exports = message = async (m, message, startTime) => {
 		}
 
 		if (isCmd) {
+			await saveUser();
 			switch (command) {
 				
 				case "kuismtk":
@@ -542,7 +535,6 @@ module.exports = message = async (m, message, startTime) => {
 					kuismtkk.push(chat.id);
 					fs.writeFileSync("./settings/kuismtkk.json",JSON.stringify(kuismtkk));
 					break;
-
 				case "leaderboard":
 					if (!isGroupMsg)
 						return await m.reply(from, "fitur ini hanya untuk group", id);
@@ -706,22 +698,59 @@ module.exports = message = async (m, message, startTime) => {
 					}
 					break;
 
+				case "clearhistory":
+					try {
+						if(fs.existsSync(pathname)){
+							const data = fs.readFileSync(pathname, 'utf8');
+							history = JSON.parse(data);
+							if (Array.isArray(history) && history.length !== 0) {
+								fs.writeFileSync(pathname, "[]");
+								await m.reply(from, "berhasil hapus history", id)
+							}else{
+								await m.reply(from, "history kosong..", id)
+							}
+						}else{
+							await m.reply(from, "Anda tidak terdaftar..", id)
+
+						}
+
+					} catch (error) {
+						log(error)
+					}
+				
+					break;
 				case "b":
 				case "bard":
 					try {
 						if (isTeks)
 							return m.reply(
 								from,
-								`Chat dengan gemini AI\n\nContoh:\n${prefix}${command} halo apa`,
+								`Chat dengan gemini AI\n\nContoh:\n${prefix}${command} kamu siapa?`,
 								id
 							);
-						ai.gemini(teks)
-						.then(async(res) => {
-							await m.reply(from, res,id);
-						})
-						.catch(async(err) => {
-							await m.reply(from, `maaf ada yang error\n${err}`, id)
-						})
+
+						if(fs.existsSync(pathname)){
+							const data = fs.readFileSync(pathname, 'utf8');
+							sleep(800);
+							history = await JSON.parse(data);
+							if (Array.isArray(history) && history.length === 0) {
+								await m.sendText(from, `_[pengingat]_\n_history chat mu akan disimpan sementara biar si AI bisa diajak ngobrol.._\n_ketik *${prefix}clearhistory* untuk menghapus history chat dengan AI, dan memulai dengan konteks baru_`)
+							}
+							log(history.length)
+
+							ai.gemini(teks, chatId)
+							.then(async(res) => {
+								await m.reply(from, res,id);
+							})
+							.catch(async(err) => {
+								await m.reply(from, `duh ada yang error\n${err}`, id)
+							})
+
+
+						}
+						else{
+							log("file not exists")
+						}
 						// const genAI = new GoogleGenerativeAI(key.gemini);
 						// const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
@@ -2114,7 +2143,28 @@ module.exports = message = async (m, message, startTime) => {
 						
 					}
 					break;
-
+				case "translate":
+					break;
+				case "artinama":
+					break;
+				case "igs":
+					break;
+				case "Alaudio":
+					break;
+				case "tafsir":
+					break;
+				case "surah":
+					break;
+				case "infosurah":
+					break;
+				case "wiki":
+					break;
+				case "Alaudio":
+					break;
+				case "Alaudio":
+					break;
+				case "Alaudio":
+					break;
 				default:
 					m.reply(from, "saat ini menu belum tersedia", id);
 					console.log("menu tidak ada");
