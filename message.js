@@ -10,7 +10,9 @@ const fss = require("fs");
 const path = require("path");
 const Math_js = require("mathjs");
 const { Canvacord, Welcomer, Leaver, Rank } = require("canvacord");
-const errorImgg = "https://i.ibb.co/jRCpLfn/user.png";
+//const errorImgg = "https://i.ibb.co/jRCpLfn/user.png";
+const errorImgg= "https://raw.githubusercontent.com/ahmadhidayat22/random/main/Sample_User_Icon.png"
+
 const get = require("got");
 const { TiktokDL } = require("@tobyg74/tiktok-api-dl");
 
@@ -86,7 +88,7 @@ module.exports = message = async (m, message, startTime) => {
 				: "";
 		const pengirim = sender.id;
 		const time = moment(t * 1000).format("DD/MM/YY HH:mm:ss");
-
+//log(chat)
 		// Bot Prefix
 		body =
 			type === "chat" && body.startsWith(prefix)
@@ -281,7 +283,7 @@ module.exports = message = async (m, message, startTime) => {
 				} else {
 					pepe = ppLinks;
 				}
-
+//log(name,formattedTitle, ppLinks)
 				const card = new Welcomer()
 					.setAvatar(pepe)
 					.setUsername(verifiedName)
@@ -348,7 +350,7 @@ module.exports = message = async (m, message, startTime) => {
 			await m.reply(In, "maaf fitur masih dibuat", to);
 		};
 		const logerr = (error) => {
-			console.log(color("ERROR", 'red'), error)
+	console.log(color("ERROR", 'red'), error)
 		}
 		/////////////////////// QUIZ MTK //////////////////////////////
 
@@ -421,7 +423,7 @@ module.exports = message = async (m, message, startTime) => {
 					"Perintah ini hanya bisa di gunakan dalam group!",
 					id
 				);
-			await m.reply(from, ind.wait(), id);
+			await m.reply(from, "tunggu sebentar~", id);
 			await m.reply(
 				from,
 				`Silahkan Pilih Level Kuiz\n*Easy*\n*Medium*\n*Hard*`,
@@ -630,7 +632,7 @@ module.exports = message = async (m, message, startTime) => {
 					let leaderboard = "*── 「 LEADERBOARDS 」 ──*\n\n";
 					try {
 						for (let i = 0; i < resp.length; i++) {
-							log(resp[i].level);
+							//log(resp[i].level);
 							let roles = "Copper V";
 
 							if (resp[i].level >= 5) roles = "Copper IV";
@@ -677,6 +679,7 @@ module.exports = message = async (m, message, startTime) => {
 					} else {
 						pepe = ppLink;
 					}
+					log(pepe,errorImgg)
 					const requiredXp = 5 * Math.pow(userLevel, 2) + 50 * userLevel + 100;
 					const rank = new Rank()
 						.setAvatar(pepe)
@@ -823,8 +826,7 @@ module.exports = message = async (m, message, startTime) => {
 									`_[pengingat]_\n_history chat mu akan disimpan sementara biar si AI bisa diajak ngobrol.._\n_ketik *${prefix}clearhistory* untuk menghapus history chat dengan AI, dan memulai dengan konteks baru_`
 								);
 							}
-							log(history.length);
-
+							
 							ai.gemini(teks, chatId)
 								.then(async (res) => {
 									await m.reply(from, res, id);
@@ -1549,12 +1551,12 @@ module.exports = message = async (m, message, startTime) => {
 							);
 						let msg = body.slice(4);
 						const chatz = await m.getAllChatIds();
-						// log(chatz)
+						// log(msg)
 						for (let idk of chatz) {
 							var cvk = await m.getChatById(idk);
 							log(idk);
-							// if (!cvk.isReadOnly) m.sendText(idk, `${msg}`)
-							// if (cvk.isReadOnly) m.sendText(idk, `${msg}`)
+							 if (!cvk.isReadOnly) m.sendText(idk, `${msg}`)
+							  if (cvk.isReadOnly) m.sendText(idk, `${msg}`)
 							await sleep(1000);
 						}
 						log(color("[SUCCES]", "green"), "sending broadcast");
@@ -1772,13 +1774,14 @@ module.exports = message = async (m, message, startTime) => {
 									
 									log(response.data.video[0])
 
-									await m.sendImage(from,response.data.video[0], "tkmp4.mov","",id );
+									await m.sendFileFromUrl(from,response.data.video[0], "tkmp4.mp4","",id );
 							} else {
 									m.reply(from,`gagal mendownload\ncoba lagi nanti`,id);
 								};
 								
 					} catch (error) {
-						logerr(error);
+await m.reply(from, "maaf ada yang error", id)				
+		logerr(error);
 					}
 					break;
 				case "tkmp3":

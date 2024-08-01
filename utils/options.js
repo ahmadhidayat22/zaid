@@ -9,7 +9,7 @@ module.exports = options = (headless, start) => {
         sessionId: 'bot',
         headless: headless,
         logConsole: false,
-        useChrome: true,
+        useChrome: false,
         autoRefresh:true,
         cacheEnabled:false,
         qrTimeout: 0,
