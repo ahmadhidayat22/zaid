@@ -10,8 +10,10 @@ const fss = require("fs");
 const path = require("path");
 const Math_js = require("mathjs");
 const { Canvacord, Welcomer, Leaver, Rank } = require("canvacord");
+const schedule = require('node-schedule');
+
 //const errorImgg = "https://i.ibb.co/jRCpLfn/user.png";
-const errorImgg= "https://raw.githubusercontent.com/ahmadhidayat22/random/main/Sample_User_Icon.png"
+const errorImgg= fs.readFileSync(path.join(__dirname, "media/empty_profile.jpg"))
 
 const get = require("got");
 const { TiktokDL } = require("@tobyg74/tiktok-api-dl");
@@ -46,7 +48,7 @@ let { ownerNumber, groupLimit, limitCount, memberLimit, prefix } = setting;
 module.exports = message = async (m, message, startTime) => {
 	try {
 		let _user = JSON.parse(fs.readFileSync("./settings/user.json"));
-
+		
 		const banned = JSON.parse(fs.readFileSync("./settings/banned.json"));
 		const timerEasy = 5000;
 		const timerMed = 10000;
@@ -71,6 +73,7 @@ module.exports = message = async (m, message, startTime) => {
 			mentionedJidList,
 		} = message;
 		let { body } = message;
+		// log(body)
 		var { items, name, formattedTitle } = chat;
 		let { text } = message;
 		let { pushname, formattedName } = sender;
@@ -80,6 +83,8 @@ module.exports = message = async (m, message, startTime) => {
 		const groupMembers = isGroupMsg ? await m.getGroupMembersId(groupId) : "";
 		// const isOwner = sender.id === ownerNumber.includes
 		const isGroupAdmins = groupAdmins.includes(sender.id) || false;
+		var prefix = /^[\\/!#.]/gi.test(body) ? body.match(/^[\\/!#.]/gi) : "/";
+
 		const chats =
 			type === "chat"
 				? body
@@ -90,15 +95,16 @@ module.exports = message = async (m, message, startTime) => {
 		const time = moment(t * 1000).format("DD/MM/YY HH:mm:ss");
 //log(chat)
 		// Bot Prefix
-		body =
-			type === "chat" && body.startsWith(prefix)
+		body = type === "chat" && body.startsWith(prefix)
 				? body
 				: (type === "image" || type === "video" || type === "document") &&
 				  caption &&
 				  caption.startsWith(prefix)
 				? caption
 				: "";
+		// log(type)
 		const command = body.slice(1).trim().split(/ +/).shift().toLowerCase();
+
 		const commandd = caption || body || "";
 		const arg = body.substring(body.indexOf(" ") + 1);
 		const validMessage = caption ? caption : body;
@@ -106,7 +112,11 @@ module.exports = message = async (m, message, startTime) => {
 		const args = body.trim().split(/ +/).slice(1);
 		const argv = body.slice(1).trim().split(/ +/).shift().toLowerCase();
 		const isCmd = body.startsWith(prefix);
+		
+		// log(body)
 		const argus = commandd.split(" ");
+
+		
 		const teks = args.join(" ");
 		const isBotGroupAdmins = groupAdmins.includes(botNumber) || false;
 		const isQuotedImage = quotedMsg && quotedMsg.type === "image";
@@ -278,7 +288,7 @@ module.exports = message = async (m, message, startTime) => {
 				const { id, verifiedName } = user;
 
 				const ppLinks = await m.getProfilePicFromServer(userId);
-				if (ppLinks === undefined) {
+				if (ppLinks === undefined || ppLinks == "ERROR: 404") {
 					var pepe = errorImgg;
 				} else {
 					pepe = ppLinks;
@@ -315,7 +325,7 @@ module.exports = message = async (m, message, startTime) => {
 				const { id, verifiedName } = user;
 
 				const ppLinks = await m.getProfilePicFromServer(userId);
-				if (ppLinks === undefined) {
+				if (ppLinks === undefined || ppLinks == "ERROR: 404") {
 					var pepe = errorImgg;
 				} else {
 					pepe = ppLinks;
@@ -352,6 +362,8 @@ module.exports = message = async (m, message, startTime) => {
 		const logerr = (error) => {
 	console.log(color("ERROR", 'red'), error)
 		}
+
+		
 		/////////////////////// QUIZ MTK //////////////////////////////
 
 		if (isGroupMsg) {
@@ -465,7 +477,7 @@ module.exports = message = async (m, message, startTime) => {
 				await sleep(timerEasy);
 				if (kuismtk.includes(chat.id)) {
 					let kuii = kuismtk.indexOf(chatId);
-					let res = easy.indexOf(Math_js.evaluate(`${kuli}${meti}${kuil2}`));
+					let res = easy.indexOf(Math_js.evaluate(`${kuil}${noval}${kuil2}`));
 
 					kuismtk.splice(kuii, 1);
 					fs.writeFileSync(
@@ -674,12 +686,12 @@ module.exports = message = async (m, message, startTime) => {
 					const userLevel = point.getLevelingLevel(sender.id, _point);
 					const userXp = point.getLevelingPoint(sender.id, _point);
 					const ppLink = await m.getProfilePicFromServer(sender.id);
-					if (ppLink === undefined) {
+					if (ppLink === undefined || ppLink == "ERROR: 404") {
 						var pepe = errorImgg;
 					} else {
 						pepe = ppLink;
 					}
-					log(pepe,errorImgg)
+					// log(pepe, ppLink)
 					const requiredXp = 5 * Math.pow(userLevel, 2) + 50 * userLevel + 100;
 					const rank = new Rank()
 						.setAvatar(pepe)
@@ -709,7 +721,7 @@ module.exports = message = async (m, message, startTime) => {
 
 				case "welcome":
 					const ppLinks = await m.getProfilePicFromServer(sender.id);
-					if (ppLinks === undefined) {
+					if (ppLinks === undefined || ppLinks == "ERROR: 404") {
 						var pepe = errorImgg;
 					} else {
 						pepe = ppLinks;
@@ -894,8 +906,6 @@ module.exports = message = async (m, message, startTime) => {
 					}
 
 					break;
-
-				
 
 				case "wordpdf":
 					// console.log(mimetype);
@@ -1084,7 +1094,6 @@ module.exports = message = async (m, message, startTime) => {
 				case "menu":
 					await m.reply(from, menu.listMenu(), id);
 					break;
-
 				case "menuadmin":
 					if (!isGroupAdmins)
 						return await m.reply(
@@ -1094,7 +1103,6 @@ module.exports = message = async (m, message, startTime) => {
 						);
 					await m.reply(from, menu.textAdmin(), id);
 					break;
-
 				case "menupenting":
 					await m.reply(from, menu.menupenting(), id);
 					break;
@@ -1758,23 +1766,30 @@ module.exports = message = async (m, message, startTime) => {
 						const axios = require('axios');
 						const tiktokApi = {
 							method: 'GET',
-							url: 'https://tiktok-downloader-download-tiktok-videos-without-watermark.p.rapidapi.com/index',
+							url: 'https://social-media-video-downloader.p.rapidapi.com/smvd/get/tiktok',
 							params: {
 							  url: urlVid
 							},
 							headers: {
-							  'X-RapidAPI-Key': '766d24ccc8msh20c3ff3132d20fep1e10fajsnc931cbce4d46',
-							  'X-RapidAPI-Host': 'tiktok-downloader-download-tiktok-videos-without-watermark.p.rapidapi.com'
+							  'x-rapidapi-key': '766d24ccc8msh20c3ff3132d20fep1e10fajsnc931cbce4d46',
+							  'x-rapidapi-host': 'social-media-video-downloader.p.rapidapi.com'
 							}
 						  };
 						   const response = await axios.request(tiktokApi);
 						   if (response.status == 200 ) {
 									// response.data.video
 									await m.reply(from,`tunggu sebentar`,id);
-									
-									log(response.data.video[0])
+									(response.data.links).map(async(item) => {
+										if(item.quality == "video_hd_480p_normal" || item.quality == "video_hd_original" || item.quality == "video_hd_540p_normal"){
+											await m.sendFileFromUrl(from,item.link, "results.mp4","",id );
+											log("sukses")
+											return;
+										}
+										// log(item)
+									})
+									// log(response.data)
 
-									await m.sendFileFromUrl(from,response.data.video[0], "tkmp4.mp4","",id );
+									// await m.sendFileFromUrl(from,response.data.video[0], "results.mp4","",id );
 							} else {
 									m.reply(from,`gagal mendownload\ncoba lagi nanti`,id);
 								};
@@ -2117,7 +2132,6 @@ await m.reply(from, "maaf ada yang error", id)
 					}
 					break;
 				case "mystat":
-					{
 						const userid = sender.id;
 						const ban = banned.includes(userid);
 						const blocked = await m.getBlockedIds();
@@ -2144,14 +2158,13 @@ await m.reply(from, "maaf ada yang error", id)
 							} else {
 								const contact = ct.pushname;
 								const dp = await m.getProfilePicFromServer(userid);
-								if (dp == undefined) {
-									var pfp =
-										"https://raw.githubusercontent.com/Gimenz/line-break/master/profil.jpg";
-								} else {
-									var pfp = dp;
-								}
+								let pfp =  dp == undefined || dp == 'ERROR: 404' ? errorImgg : dp;
+
+								// if (dp == undefined) {
+								// 	pfp = errorImgg;
+								// }
 								if (contact == undefined) {
-									var nama = "_Dia pemalu, tidak mau menampilkan namanya_";
+									var nama = "_MR. No name_";
 								} else {
 									var nama = contact;
 								}
@@ -2169,12 +2182,13 @@ await m.reply(from, "maaf ada yang error", id)
 										? `\n\n _you are blocked?_chat the owner_ try:*${prefix}owner* `
 										: ""
 								}`;
+								// log(pfp);
 								m.sendFileFromUrl(from, pfp, "dp.jpg", caption);
 							}
 						} catch (error) {
 							console.log(color("ERROR", "red"), error);
 						}
-					}
+					
 					break;
 				case "owner":
 					try {

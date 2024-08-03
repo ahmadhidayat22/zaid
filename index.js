@@ -113,11 +113,14 @@ create(options(true, start))
   console.log(err);
 })
 
-// let file = require.resolve(__filename);
-// fs.watchFile(file, () => {
-//   fs.unwatchFile(file);
-//   console.log(chalk.redBright(`Update ${__filename}`));
-//   delete require.cache[file];
-//   require(file);
-// });
+process.on('SIGTERM', () => {
+  console.log('SIGTERM received');
+  // Clean up and exit
+  process.exit(0);
+});
 
+process.on('SIGINT', () => {
+  console.log('SIGINT received');
+  // Clean up and exit
+  process.exit(0);
+});
