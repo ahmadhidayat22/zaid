@@ -11,6 +11,10 @@ const path = require("path");
 const Math_js = require("mathjs");
 const { Canvacord, Welcomer, Leaver, Rank } = require("canvacord");
 const schedule = require('node-schedule');
+const { tmpdir } = require("os");
+const Crypto = require("crypto");
+const ff = require("fluent-ffmpeg");
+const webp = require("node-webpmux");
 
 //const errorImgg = "https://i.ibb.co/jRCpLfn/user.png";
 const errorImgg= fs.readFileSync(path.join(__dirname, "media/empty_profile.jpg"))
@@ -73,7 +77,13 @@ module.exports = message = async (m, message, startTime) => {
 			mentionedJidList,
 		} = message;
 		let { body } = message;
-		// log(body)
+		body = type === "chat"
+			? body
+			: type === "image" || type === "video"
+			? caption
+			: "";
+
+		//log(message);
 		var { items, name, formattedTitle } = chat;
 		let { text } = message;
 		let { pushname, formattedName } = sender;
@@ -93,7 +103,7 @@ module.exports = message = async (m, message, startTime) => {
 				: "";
 		const pengirim = sender.id;
 		const time = moment(t * 1000).format("DD/MM/YY HH:mm:ss");
-//log(chat)
+		
 		// Bot Prefix
 		body = type === "chat" && body.startsWith(prefix)
 				? body
@@ -102,9 +112,9 @@ module.exports = message = async (m, message, startTime) => {
 				  caption.startsWith(prefix)
 				? caption
 				: "";
-		// log(type)
+		
 		const command = body.slice(1).trim().split(/ +/).shift().toLowerCase();
-
+		// log(command)
 		const commandd = caption || body || "";
 		const arg = body.substring(body.indexOf(" ") + 1);
 		const validMessage = caption ? caption : body;
@@ -112,6 +122,7 @@ module.exports = message = async (m, message, startTime) => {
 		const args = body.trim().split(/ +/).slice(1);
 		const argv = body.slice(1).trim().split(/ +/).shift().toLowerCase();
 		const isCmd = body.startsWith(prefix);
+        const isImage = type === 'image'
 		
 		// log(body)
 		const argus = commandd.split(" ");
@@ -151,7 +162,7 @@ module.exports = message = async (m, message, startTime) => {
 		const originalText = teks;
 		const maxLength = 30;
 		const teks_singkat = truncateText(originalText, maxLength);
-		let _isRegistered = false;
+		let _isRegistered = false; // dont delete if 'is declared but never used'
 
 		//   console.log(truncatedText); // Output: "Lorem ipsum dolor sit amet, consectetur adipiscing elit..."
 
@@ -362,6 +373,71 @@ module.exports = message = async (m, message, startTime) => {
 		const logerr = (error) => {
 	console.log(color("ERROR", 'red'), error)
 		}
+		async function imageToWebp(media) {
+			const tmpFileOut = path.join(
+			  tmpdir(),
+			  `${Crypto.randomBytes(6).readUIntLE(0, 6).toString(36)}.webp`
+			);
+			const tmpFileIn = path.join(
+			  tmpdir(),
+			  `${Crypto.randomBytes(6).readUIntLE(0, 6).toString(36)}.jpg`
+			);
+		  
+			fs.writeFileSync(tmpFileIn, media);
+		  
+			await new Promise((resolve, reject) => {
+			  ff(tmpFileIn)
+				.on("error", reject)
+				.on("end", () => resolve(true))
+				.addOutputOptions([
+				  "-vcodec",
+				  "libwebp",
+				  "-vf",
+				  "scale='min(320,iw)':min'(320,ih)':force_original_aspect_ratio=decrease,fps=15, pad=320:320:-1:-1:color=white@0.0, split [a][b]; [a] palettegen=reserve_transparent=on:transparency_color=ffffff [p]; [b][p] paletteuse",
+				])
+				.toFormat("webp")
+				.save(tmpFileOut);
+			});
+		  
+			const buff = fs.readFileSync(tmpFileOut);
+			fs.unlinkSync(tmpFileOut);
+			fs.unlinkSync(tmpFileIn);
+			return buff;
+		  }
+		  async function writeExifImg(media, metadata) {
+			let wMedia = await imageToWebp(media);
+			const tmpFileIn = path.join(
+			  "./",
+			  `${Crypto.randomBytes(6).readUIntLE(0, 6).toString(36)}.webp`
+			);
+			const tmpFileOut = path.join(
+			  "./",
+			  `${Crypto.randomBytes(6).readUIntLE(0, 6).toString(36)}.webp`
+			);
+			fs.writeFileSync(tmpFileIn, wMedia);
+		  
+			if (metadata.packname || metadata.author) {
+			  const img = new webp.Image();
+			  const json = {
+				"sticker-pack-id": `https://github.com/DikaArdnt/Hisoka-Morou`,
+				"sticker-pack-name": metadata.packname,
+				"sticker-pack-publisher": metadata.author,
+				emojis: metadata.categories ? metadata.categories : [""],
+			  };
+			  const exifAttr = Buffer.from([
+				0x49, 0x49, 0x2a, 0x00, 0x08, 0x00, 0x00, 0x00, 0x01, 0x00, 0x41, 0x57,
+				0x07, 0x00, 0x00, 0x00, 0x00, 0x00, 0x16, 0x00, 0x00, 0x00,
+			  ]);
+			  const jsonBuff = Buffer.from(JSON.stringify(json), "utf-8");
+			  const exif = Buffer.concat([exifAttr, jsonBuff]);
+			  exif.writeUIntLE(jsonBuff.length, 14, 4);
+			  await img.load(tmpFileIn);
+			  fs.unlinkSync(tmpFileIn);
+			  img.exif = exif;
+			  await img.save(tmpFileOut);
+			  return tmpFileOut;
+			}
+		  }
 
 		
 		/////////////////////// QUIZ MTK //////////////////////////////
@@ -1878,18 +1954,39 @@ await m.reply(from, "maaf ada yang error", id)
 					break;
 				case "sticker":
 				case "stiker":
-					try {
-						if (mimetype) {
-							const mediaData = await decryptMedia(message);
-							// log(mediaData);
-							await m.sendImageAsSticker(from, mediaData, {
-								packname: "🚀",
-								author: "🚀",
-							});
+					// if (isMedia && isImage || isQuotedImage) {
+						const encryptMedia = isQuotedImage ? quotedMsg : message
+
+						let buffer = await decryptMedia(encryptMedia);
+						buffer = await writeExifImg(buffer, {
+							packname: "🚀",
+							author: "🚀",
+						  });
+
+						
+						try {
+							await m.sendImageAsSticker(from , buffer)
+							fs.unlinkSync(buffer);
+
+						} catch (error) {
+							await m.reply(from , "maaf ada yang error", id);
+							logerr(error)
 						}
-					} catch (error) {
-						console.log(color("ERR", "red"), error);
-					}
+					// }
+
+					// try {
+					// 	if (mimetype) {
+					// 		const mediaData = await decryptMedia(message);
+					// 		// log(mediaData);
+					// 		await m.sendImageAsSticker(from, mediaData, {
+					// 			packname: "🚀",
+					// 			author: "🚀",
+					// 		});
+					// 	}
+					// } catch (error) {
+					// 	await m.reply(from , error.data, id);
+					// 	console.log(color("ERR", "red"), error);
+					// }
 					break;
 
 				case "speech":
