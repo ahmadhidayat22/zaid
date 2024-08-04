@@ -15,7 +15,7 @@ module.exports = options = (headless, start) => {
         qrTimeout: 0,
         authTimeout: 0,
         restartOnCrash: start,
-        
+        executablePath : "/usr/bin/google-chrome-stable" //for linux server
         
     }
     return options
