@@ -2267,7 +2267,7 @@ module.exports = message = async (m, message, startTime) => {
 							} else {
 								const contact = ct.pushname;
 								const dp = await m.getProfilePicFromServer(userid);
-								let pfp =  dp == undefined || dp == 'ERROR: 404' ? errorImgg : dp;
+								let pfp =  dp == undefined || dp == 'ERROR: 404'|| dp == 'ERROR: 401' ? errorImgg : dp;
 
 								// if (dp == undefined) {
 								// 	pfp = errorImgg;
