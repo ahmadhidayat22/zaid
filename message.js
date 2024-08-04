@@ -299,7 +299,7 @@ module.exports = message = async (m, message, startTime) => {
 				const { id, verifiedName } = user;
 
 				const ppLinks = await m.getProfilePicFromServer(userId);
-				if (ppLinks === undefined || ppLinks == "ERROR: 404") {
+				if (ppLinks === undefined || ppLinks == "ERROR: 404" || ppLinks == "ERROR: 401") {
 					var pepe = errorImgg;
 				} else {
 					pepe = ppLinks;
@@ -336,7 +336,7 @@ module.exports = message = async (m, message, startTime) => {
 				const { id, verifiedName } = user;
 
 				const ppLinks = await m.getProfilePicFromServer(userId);
-				if (ppLinks === undefined || ppLinks == "ERROR: 404") {
+				if (ppLinks === undefined || ppLinks == "ERROR: 404" || ppLinks == "ERROR: 401") {
 					var pepe = errorImgg;
 				} else {
 					pepe = ppLinks;
@@ -797,7 +797,7 @@ module.exports = message = async (m, message, startTime) => {
 
 				case "welcome":
 					const ppLinks = await m.getProfilePicFromServer(sender.id);
-					if (ppLinks === undefined || ppLinks == "ERROR: 404") {
+					if (ppLinks === undefined || ppLinks == "ERROR: 404" || ppLinks == "ERROR: 401") {
 						var pepe = errorImgg;
 					} else {
 						pepe = ppLinks;
