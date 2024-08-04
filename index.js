@@ -90,7 +90,7 @@ function start(client) {
 
   client.onIncomingCall(async (callData) => {
     const banned = JSON.parse(fs.readFileSync("./settings/banned.json"));
-    log(banned)
+    // log(banned)
     const number = (callData.peerJid).replace(":60", "")
     // ketika seseorang menelpon nomor bot akan mengirim pesan
     await client.sendText(number, `Maaf sedang tidak bisa menerima panggilan.\nnelfon = block dan banned\nuntuk membuka silahkan chat owner wa.me/${ownerNumber.replace('@c.us','')} \n\n-bot`)

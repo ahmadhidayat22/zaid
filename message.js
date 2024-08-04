@@ -538,7 +538,7 @@ module.exports = message = async (m, message, startTime) => {
 				kuismtk.push(chat.id);
 				fs.writeFileSync("./settings/kuismtk.json", JSON.stringify(kuismtk));
 				if (typeof Math_js.evaluate(`${kuil} ${noval} ${kuil2}`) !== "number") {
-					await m.reply(from, ind.notNum(`${kuil}`), id);
+					await m.reply(from, "", id);
 				} else {
 					easy.push(`${Math_js.evaluate(`${kuil}${noval}${kuil2}`)}`);
 					fs.writeFileSync("./settings/easy.json", JSON.stringify(easy));
@@ -762,12 +762,12 @@ module.exports = message = async (m, message, startTime) => {
 					const userLevel = point.getLevelingLevel(sender.id, _point);
 					const userXp = point.getLevelingPoint(sender.id, _point);
 					const ppLink = await m.getProfilePicFromServer(sender.id);
-					if (ppLink === undefined || ppLink == "ERROR: 404") {
+					if (ppLink === undefined || ppLink == "ERROR: 404" ||  ppLink == "ERROR: 401") {
 						var pepe = errorImgg;
 					} else {
 						pepe = ppLink;
 					}
-					// log(pepe, ppLink)
+					// log( sender)
 					const requiredXp = 5 * Math.pow(userLevel, 2) + 50 * userLevel + 100;
 					const rank = new Rank()
 						.setAvatar(pepe)
@@ -1669,7 +1669,7 @@ module.exports = message = async (m, message, startTime) => {
 					break;
 				case "addupdate":
 					try {
-						log(isTeks);
+						
 						if (!isOwnerBot)
 							return m.reply(
 								from,
@@ -1683,10 +1683,12 @@ module.exports = message = async (m, message, startTime) => {
 								id
 							);
 						const update = body.slice(10);
+						// log(update)
 						updateBot.push(update);
+						// log(updateBot)
 						fs.writeFileSync(
 							"./settings/update.json",
-							JSON.stringify(updateBot)
+							JSON.stringify(updateBot, null, 2)
 						);
 						m.reply(from, `Sukses menambahkan update :)`, id);
 					} catch (error) {
@@ -1705,6 +1707,16 @@ module.exports = message = async (m, message, startTime) => {
 						await m.sendText(from, updatee);
 					} catch (error) {
 						console.log(color("ERROR", "red"), error);
+					}
+					break;
+				case "clearupdate":
+					try {
+						fs.writeFileSync('./settings/update.json', JSON.stringify([], null, 2));
+						await m.reply(from, "berhasil hapus list update", id);
+
+					} catch (error) {
+						await m.reply(from, error, id);
+						logerr(error)
 					}
 					break;
 				case "leaveall": //mengeluarkan bot dari semua group serta menghapus chatnya
@@ -1853,26 +1865,25 @@ module.exports = message = async (m, message, startTime) => {
 						  };
 						   const response = await axios.request(tiktokApi);
 						   if (response.status == 200 ) {
-									// response.data.video
-									await m.reply(from,`tunggu sebentar`,id);
-									(response.data.links).map(async(item) => {
-										if(item.quality == "video_hd_480p_normal" || item.quality == "video_hd_original" || item.quality == "video_hd_540p_normal"){
-											await m.sendFileFromUrl(from,item.link, "results.mp4","",id );
-											log("sukses")
-											return;
-										}
-										// log(item)
-									})
-									// log(response.data)
+								// response.data.video
+								const video = response.data.links[0];
+								const quality = response.data.links[0];
+								await m.reply(from, "sedang diproses 🚀", id);
 
-									// await m.sendFileFromUrl(from,response.data.video[0], "results.mp4","",id );
+
+								if(quality.quality !== "audio"){
+									await m.sendFileFromUrl(from,video.link, "results.mp4","",id );
+									log("sukses");
+								}
+								
+
 							} else {
 									m.reply(from,`gagal mendownload\ncoba lagi nanti`,id);
 								};
 								
 					} catch (error) {
-await m.reply(from, "maaf ada yang error", id)				
-		logerr(error);
+						await m.reply(from, "maaf ada yang error", id)				
+						logerr(error);
 					}
 					break;
 				case "tkmp3":
@@ -1899,7 +1910,8 @@ await m.reply(from, "maaf ada yang error", id)
 						   const response = await axios.request(tiktokApi);
 						   if (response.status == 200 ) {
 									// response.data.video
-									await m.reply(from,`tunggu sebentar`,id);
+									await m.reply(from, "sedang diproses 🚀", id);
+
 									
 									// log(response.data.video[0])
 
