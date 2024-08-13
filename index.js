@@ -6,6 +6,7 @@ const options = require('./utils/options')
 const figlet = require('figlet')
 const chalk = require('chalk');
 const { log } = require('console');
+const message = require('./message');
 const errorImgg = "https://i.ibb.co/jRCpLfn/user.png";
 const setting = JSON.parse(fs.readFileSync("./settings/setting.json"));
 let { ownerNumber, groupLimit, limitCount, memberLimit, prefix } = setting;
@@ -76,7 +77,7 @@ function start(client) {
     try{
       client.getAmountOfLoadedMessages() // menghapus pesan cache jika sudah 3000 pesan.
               .then((msg) => {
-                  if (msg >= 1000) {
+                  if (msg >= 100) {
                       console.log('[BOT]', color(`Loaded Message Reach ${msg}, cuting message cache...`, 'yellow'))
                       client.cutMsgCache()
                   }
@@ -93,13 +94,17 @@ function start(client) {
     // log(banned)
     const number = (callData.peerJid).replace(":60", "")
     // ketika seseorang menelpon nomor bot akan mengirim pesan
-    await client.sendText(number, `Maaf sedang tidak bisa menerima panggilan.\nnelfon = block dan banned\nuntuk membuka silahkan chat owner wa.me/${ownerNumber.replace('@c.us','')} \n\n-bot`)
-        
-            // bot akan memblock nomor itu
-    await client.contactBlock(number)
-    banned.push(number)
-    fs.writeFileSync('./settings/banned.json', JSON.stringify(banned))
-       
+    try {
+      await client.autoReject();
+      await client.sendText(number, `Maaf sedang tidak bisa menerima panggilan.\nnelfon = block dan banned\nuntuk membuka silahkan chat owner wa.me/${ownerNumber.replace('@c.us','')} \n\n-bot`)
+          
+              // bot akan memblock nomor itu
+      await client.contactBlock(number)
+      banned.push(number)
+      fs.writeFileSync('./settings/banned.json', JSON.stringify(banned))
+    } catch (error) {
+        console.log(color("ERROR" ,'red'), error);
+    } 
   })
 
   

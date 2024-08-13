@@ -3,14 +3,12 @@ moment.tz.setDefault("Asia/Jakarta").locale("id");
 const fs = require("fs-extra");
 const axios = require("axios");
 const { color } = require("./utils");
-const { GoogleGenerativeAI } = require("@google/generative-ai");
 const { decryptMedia } = require("@open-wa/wa-automate");
 const mime = require("mime-types");
 const fss = require("fs");
 const path = require("path");
 const Math_js = require("mathjs");
 const { Canvacord, Welcomer, Leaver, Rank } = require("canvacord");
-const schedule = require('node-schedule');
 const { tmpdir } = require("os");
 const Crypto = require("crypto");
 const ff = require("fluent-ffmpeg");
@@ -296,7 +294,7 @@ module.exports = message = async (m, message, startTime) => {
 				userId += "@c.us";
 				// log(userId,from, id)
 				const user = await m.getContact(userId);
-				const { id, verifiedName } = user;
+				const { id, verifiedName, pushname , name} = user;
 
 				const ppLinks = await m.getProfilePicFromServer(userId);
 				if (ppLinks === undefined || ppLinks == "ERROR: 404" || ppLinks == "ERROR: 401") {
@@ -304,10 +302,10 @@ module.exports = message = async (m, message, startTime) => {
 				} else {
 					pepe = ppLinks;
 				}
-//log(name,formattedTitle, ppLinks)
+				//log(name,formattedTitle, ppLinks)
 				const card = new Welcomer()
 					.setAvatar(pepe)
-					.setUsername(verifiedName)
+					.setUsername(verifiedName || pushname || name)
 					.setDiscriminator(id.substring(6, 10))
 					.setGuildName(name || formattedTitle)
 					.setMemberCount(groupMembers.length);
@@ -333,7 +331,7 @@ module.exports = message = async (m, message, startTime) => {
 			try {
 				// log(userId,from, id)
 				const user = await m.getContact(userId);
-				const { id, verifiedName } = user;
+				const { id, verifiedName, pushname , name} = user;
 
 				const ppLinks = await m.getProfilePicFromServer(userId);
 				if (ppLinks === undefined || ppLinks == "ERROR: 404" || ppLinks == "ERROR: 401") {
@@ -344,7 +342,7 @@ module.exports = message = async (m, message, startTime) => {
 
 				const card = new Leaver()
 					.setAvatar(pepe)
-					.setUsername(verifiedName)
+					.setUsername(verifiedName || pushname || name)
 					.setDiscriminator(id.substring(6, 10))
 					.setGuildName(name || formattedTitle)
 					.setMemberCount(groupMembers.length);
@@ -371,7 +369,7 @@ module.exports = message = async (m, message, startTime) => {
 			await m.reply(In, "maaf fitur masih dibuat", to);
 		};
 		const logerr = (error) => {
-	console.log(color("ERROR", 'red'), error)
+			console.log(color("ERROR", 'red'), error)
 		}
 		async function imageToWebp(media) {
 			const tmpFileOut = path.join(
@@ -795,33 +793,33 @@ module.exports = message = async (m, message, startTime) => {
 						});
 					break;
 
-				case "welcome":
-					const ppLinks = await m.getProfilePicFromServer(sender.id);
-					if (ppLinks === undefined || ppLinks == "ERROR: 404" || ppLinks == "ERROR: 401") {
-						var pepe = errorImgg;
-					} else {
-						pepe = ppLinks;
-					}
-					const card = new Welcomer()
-						.setAvatar(pepe)
-						.setUsername(pushname)
-						.setDiscriminator(sender.id.substring(6, 10))
-						.setGuildName(name || formattedTitle)
-						.setMemberCount(groupMembers.length);
+				// case "welcome":
+				// 	const ppLinks = await m.getProfilePicFromServer(sender.id);
+				// 	if (ppLinks === undefined || ppLinks == "ERROR: 404" || ppLinks == "ERROR: 401") {
+				// 		var pepe = errorImgg;
+				// 	} else {
+				// 		pepe = ppLinks;
+				// 	}
+				// 	const card = new Welcomer()
+				// 		.setAvatar(pepe)
+				// 		.setUsername(pushname)
+				// 		.setDiscriminator(sender.id.substring(6, 10))
+				// 		.setGuildName(name || formattedTitle)
+				// 		.setMemberCount(groupMembers.length);
 
-					card
-						.build()
-						.then(async (buffer) => {
-							const imageBase64 = `data:image/png;base64,${buffer.toString(
-								"base64"
-							)}`;
-							await m.sendImage(from, imageBase64, "welcome.png", "", id);
-						})
-						.catch(async (err) => {
-							console.error(err);
-							await m.reply(from, "Error!", id);
-						});
-					break;
+				// 	card
+				// 		.build()
+				// 		.then(async (buffer) => {
+				// 			const imageBase64 = `data:image/png;base64,${buffer.toString(
+				// 				"base64"
+				// 			)}`;
+				// 			await m.sendImage(from, imageBase64, "welcome.png", "", id);
+				// 		})
+				// 		.catch(async (err) => {
+				// 			console.error(err);
+				// 			await m.reply(from, "Error!", id);
+				// 		});
+				// 	break;
 
 				case "tts":
 					if (args.length === 0)
@@ -830,6 +828,7 @@ module.exports = message = async (m, message, startTime) => {
 							"Kirim perintah *!tts [id, en, jp, ar] [teks]*, contoh *!tts id halo semua*",
 							id
 						);
+					
 					const ttsId = require("node-gtts")("id");
 					const ttsEn = require("node-gtts")("en");
 					const ttsJp = require("node-gtts")("ja");
@@ -839,40 +838,48 @@ module.exports = message = async (m, message, startTime) => {
 					if (dataText.length > 500)
 						return m.reply(from, "Teks terlalu panjang!", id);
 					var dataBhs = body.slice(5, 7);
-					if (dataBhs == "id") {
-						ttsId.save("./media/tts/resId.mp3", dataText, function () {
-							m.sendPtt(from, "./media/tts/resId.mp3", id);
-						});
-						await sleep(1000);
-						fs.unlinkSync(path.join("media", "tts", "resId.mp3"));
-					} else if (dataBhs == "en") {
-						ttsEn.save("./media/tts/resEn.mp3", dataText, function () {
-							m.sendPtt(from, "./media/tts/resEn.mp3", id);
-						});
-						await sleep(1000);
+					try {
+						if (dataBhs == "id") {
+							ttsId.save("./media/tts/resId.mp3", dataText, function () {
+								m.sendPtt(from, "./media/tts/resId.mp3", id);
+							});
+							await sleep(1000);
+							fs.unlinkSync(path.join("media", "tts", "resId.mp3"));
+						} else if (dataBhs == "en") {
+							ttsEn.save("./media/tts/resEn.mp3", dataText, function () {
+								m.sendPtt(from, "./media/tts/resEn.mp3", id);
+							});
+							await sleep(1000);
+	
+							fs.unlinkSync(path.join("media", "tts", "resEn.mp3"));
+						} else if (dataBhs == "jp") {
+							ttsJp.save("./media/tts/resJp.mp3", dataText, function () {
+								m.sendPtt(from, "./media/tts/resJp.mp3", id);
+							});
+							await sleep(1000);
+	
+							fs.unlinkSync(path.join("media", "tts", "resJp.mp3"));
+						} else if (dataBhs == "ar") {
+							ttsAr.save("./media/tts/resAr.mp3", dataText, function () {
+								m.sendPtt(from, "./media/tts/resAr.mp3", id);
+							});
+							await sleep(1000);
+	
+							fs.unlinkSync(path.join("media", "tts", "resAr.mp3"));
+						} else {
+							await m.reply(
+								from,
+								"Masukkan kode bahasa : [id] untuk indonesia, [en] untuk inggris, [jp] untuk jepang, dan [ar] untuk arab\ncontoh *!tts id halo semua*",
+								id
+							);
+						}
 
-						fs.unlinkSync(path.join("media", "tts", "resEn.mp3"));
-					} else if (dataBhs == "jp") {
-						ttsJp.save("./media/tts/resJp.mp3", dataText, function () {
-							m.sendPtt(from, "./media/tts/resJp.mp3", id);
-						});
-						await sleep(1000);
 
-						fs.unlinkSync(path.join("media", "tts", "resJp.mp3"));
-					} else if (dataBhs == "ar") {
-						ttsAr.save("./media/tts/resAr.mp3", dataText, function () {
-							m.sendPtt(from, "./media/tts/resAr.mp3", id);
-						});
-						await sleep(1000);
-
-						fs.unlinkSync(path.join("media", "tts", "resAr.mp3"));
-					} else {
-						m.reply(
-							from,
-							"Masukkan kode bahasa : [id] untuk indonesia, [en] untuk inggris, [jp] untuk jepang, dan [ar] untuk arab\ncontoh *!tts id halo semua*",
-							id
-						);
+					} catch (error) {
+						await m.reply(from, "ada yang error!", id);
+						logerr(error)
 					}
+					
 					break;
 
 				case "clearhistory":
@@ -925,20 +932,7 @@ module.exports = message = async (m, message, startTime) => {
 						} else {
 							log("file not exists");
 						}
-						// const genAI = new GoogleGenerativeAI(key.gemini);
-						// const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-
-						// let prompt =
-						// 	quotedMsg !== undefined
-						// 		? quotedMsg.text + ". ( prompt : " + teks + ")"
-						// 		: teks;
-						// // console.log(prompt, key.gemini);
-						// const result = await model.generateContent(prompt);
-						// const response = result.response;
-						// // console.log(response.promptFeedback);
-
-						// const res = response.text();
-						// await m.reply(from, res, id);
+						
 					} catch (error) {
 						console.log(color("ERROR", "red"), error);
 					}
@@ -2178,7 +2172,7 @@ module.exports = message = async (m, message, startTime) => {
 							if (cgrup.size < memberLimit)
 								return m.reply(
 									from,
-									`Apanih member dikit bat ngentot ${memberLimit} people`,
+									`Apanih member dikit bat ${memberLimit} orang`,
 									id
 								);
 							await m
@@ -2442,7 +2436,6 @@ module.exports = message = async (m, message, startTime) => {
 							m.reply(from, "Ada yang Error!", id);
 						});
 					break;
-
 				case "cekresi":
 					if (isTeks)
 						return await m.reply(
@@ -2498,38 +2491,137 @@ module.exports = message = async (m, message, startTime) => {
 					sayMaintenance(from, id);
 
 					break;
+				
+				////////////// ISLAM COMMAND //////////
+				case 'listsurah':
+                    try {
+                        axios.get('https://raw.githubusercontent.com/ArugaZ/grabbed-results/main/islam/surah.json')
+                            .then((response) => {
+                                let hehex = '╔══✪〘 List Surah 〙✪══\n'
+                                for (let i = 0; i < response.data.data.length; i++) {
+                                    hehex += '╠➥ '
+                                    hehex += response.data.data[i].name.transliteration.id.toLowerCase() + '\n'
+                                }
+                                hehex += '╚══════════'
+                                m.reply(from, hehex, id)
+                            })
+                    } catch (err) {
+                        m.reply(from, err, id)
+						logerr(errr);
+                    }
+                    break
 				case "Alaudio":
 					sayMaintenance(from, id);
 
 					break;
 				case "tafsir":
-					sayMaintenance(from, id);
+					if(args.length == 0) return await m.reply(from , `*_${prefix}tafsir <nama surah> <ayat>_*\nMenampilkan ayat Al-Quran tertentu beserta terjemahan dan tafsirnya dalam bahasa Indonesia. Contoh penggunaan : ${prefix}tafsir al-baqarah 1`, id);
+					try {
+						var responseh = await axios.get('https://raw.githubusercontent.com/ArugaZ/grabbed-results/main/islam/surah.json')
+						var { data } = responseh.data
+						var idx = data.findIndex(function (post, index) {
+							if ((post.name.transliteration.id.toLowerCase() == args[0].toLowerCase()) || (post.name.transliteration.en.toLowerCase() == args[0].toLowerCase()))
+								return true;
+						});
+						if(idx < 0) return await m.reply(from, `sepertinya format penulisan surah tidak sesuai! coba lihat di *${prefix}listsurah*`, id);
+						// log(idx)
+						nmr = data[idx].number
+						if (!isNaN(nmr)) {
+							var responseh2 = await axios.get("https://raw.githubusercontent.com/rioastamal/quran-json/master/surah/" + nmr + ".json")
+							var { data } = responseh2
+							data= data[nmr];
+							const namaLatin = data.name_latin;
+
+							const ayatLength = data.number_of_ayah;
+							let tafsir = `_Tafsir surah ${namaLatin} ayat ${args[1]}_\n`;
+							for(let i =1 ; i <= ayatLength; i++){
+								if( i == args[1]){
+									tafsir += `${data.tafsir.id.kemenag.text[i]}\n`
+								}else if(i > ayatLength  &&  args[1] > ayatLength || args[1] <= 0){
+									// log(i, ayatLength, args[1])
+									return await m.reply(from, 'ayat yang anda masukkan tidak sesuai', id)
+
+								}
+							}
+							// log(args[1]);
+
+							await m.reply(from, tafsir, id);
+						}
+					} catch (error) {
+						await m.reply(from , "maaf ada yang error", id);
+						logerr(error)
+					}
+
 
 					break;
-				case "surah":
-					sayMaintenance(from, id);
+				case 'surah':
+						if (args.length == 0) return m.reply(from, `* ${prefix}surah <nama surah> *\nMenampilkan ayat Al-Quran tertentu beserta terjemahannya dalam bahasa Indonesia. Contoh penggunaan : ${prefix}surah al-baqarah\n **pastikan nama surah harus sesuai dengan yang ada di _${prefix}listsurah_* `, message.id)
+						try {
+							
+						var responseh = await axios.get('https://raw.githubusercontent.com/ArugaZ/grabbed-results/main/islam/surah.json')
+						var { data } = responseh.data
+						var idx = data.findIndex(function (post, index) {
+							if ((post.name.transliteration.id.toLowerCase() == args[0].toLowerCase()) || (post.name.transliteration.en.toLowerCase() == args[0].toLowerCase()))
+								return true;
+						});
+						if(idx < 0) return await m.reply(from, `sepertinya format penulisan surah tidak sesuai! coba lihat di *${prefix}listsurah*`, id);
+						// log(idx)
+						nmr = data[idx].number
+						if (!isNaN(nmr)) {
+							var responseh2 = await axios.get("https://raw.githubusercontent.com/rioastamal/quran-json/master/surah/" + nmr + ".json")
+							var { data } = responseh2
+							data= data[nmr];
+							const namaLatin = data.name_latin;
+							const namaAr = data.name;
+							const ayatLength = data.number_of_ayah;
+							const judulTerjemahan = data.translations.id.name;
+							let textAyat = '';
+							let terjemahan =`_Terjemahan_ \n ════〘 ${judulTerjemahan} 〙════\n`;
+							for(let i =1 ; i <= ayatLength; i++){
+								textAyat += `\n${data.text[i]}〘${i}〙`
+								terjemahan += `〘${i}〙 ${data.translations.id.text[i]}\n`
+							}
+							// log(terjemahan)
+							let pesan= `════〘 _${namaLatin}_/${namaAr} 〙════\n`;
+							
+							pesan += textAyat
+							
+							pesan += "\n\n(Q.S. " + namaLatin + ")"
+							await m.reply(from, pesan, id)
+							await m.reply(from, terjemahan, id);
+						}
+						
+						} catch (error) {
+							await m.reply(from , "maaf ada yang error", id);
+							logerr(error)
+						}
+						break
+				case 'infosurah':
+					if (args.length == 0) return m.reply(from, `*_${prefix}infosurah <nama surah>_*\nMenampilkan informasi lengkap mengenai surah tertentu. Contoh penggunan: ${prefix}infosurah al-baqarah`, message.id)
+					try {
+							
+						var responseh = await axios.get('https://raw.githubusercontent.com/ArugaZ/grabbed-results/main/islam/surah.json')
+						var { data } = responseh.data
+						var idx = data.findIndex(function (post, index) {
+							if ((post.name.transliteration.id.toLowerCase() == args[0].toLowerCase()) || (post.name.transliteration.en.toLowerCase() == args[0].toLowerCase()))
+								return true;
+						});
+						if(idx < 0) return await m.reply(from, `sepertinya format penulisan surah tidak sesuai! coba lihat di *${prefix}listsurah*`, id);
 
-					break;
-				case "infosurah":
-					sayMaintenance(from, id);
-
-					break;
+						var pesan = ""
+						pesan = pesan + "Nama : " + data[idx].name.transliteration.id + "\n" + "Asma : " + data[idx].name.short + "\n" + "Arti : " + data[idx].name.translation.id + "\n" + "Jumlah ayat : " + data[idx].numberOfVerses + "\n" + "Nomor surah : " + data[idx].number + "\n" + "Jenis : " + data[idx].revelation.id + "\n" + "Keterangan : " + data[idx].tafsir.id
+						await m.reply(from, pesan, message.id)
+					
+					} catch (error) {
+						await m.reply(from , "maaf ada yang error", id);
+						logerr(error)		
+					}
+					break
 				case "wiki":
 					sayMaintenance(from, id);
 
 					break;
-				case "Alaudio":
-					sayMaintenance(from, id);
-
-					break;
-				case "Alaudio":
-					sayMaintenance(from, id);
-
-					break;
-				case "Alaudio":
-					sayMaintenance(from, id);
-
-					break;
+				
 				default:
 					m.reply(from, "saat ini menu belum tersedia", id);
 					break;
