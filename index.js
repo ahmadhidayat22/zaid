@@ -77,7 +77,7 @@ function start(client) {
     try{
       client.getAmountOfLoadedMessages() // menghapus pesan cache jika sudah 3000 pesan.
               .then((msg) => {
-                  if (msg >= 100) {
+                  if (msg >= 900) {
                       console.log('[BOT]', color(`Loaded Message Reach ${msg}, cuting message cache...`, 'yellow'))
                       client.cutMsgCache()
                   }
