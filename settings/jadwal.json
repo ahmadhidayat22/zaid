@@ -1,0 +1,33 @@
+[
+    {
+        "senin": [
+            "07:30-09:00 || C 306 || Probabilitas dan Statistika",
+            "09:10-10:40 || C 304 || Grafika Komputer",
+            "09:10-10:40 || C 307 || Manajemen Proyek TI",
+            "10:50-12:20 || C 304 || Forensik Digital dan Kejahatan Siber",
+            "13:00-14:30 || C 304 || Jaringan Komputer Lanjut"
+        ],
+        "selasa": [
+            "07:30-09:00 || C 302 || Kecerdasan Buatan",
+            "09:10-10:40 || C 306 || Pemrograman Piranti Bergerak",
+            "14:40-16:10 || C 302 || Sistem Pendukung Keputusan",
+            "14:40-16:10 || C 304 || Animasi Komputer dan Pemodelan 3D"
+        ],
+        "rabu": [
+            "13:00-14:30 || C 306 || Teori Bahasa dan Otomata",
+            "14:40-16:10 || C 307 || Pemrograman Web Lanjut"
+        ],
+        "kamis": [
+            "07:30-09:00 || C 302 || Komputasi Awan",
+            "07:30-09:00 || C 304 || Pemrograman Piranti Bergerak",
+            "10:50-12:20 || C 302 || Etika Profesi"
+           
+        ],
+        "jumat": [
+            "09:10-10:40 || C306 || Kalkulus"
+        ],
+        "sabtu" : ["Tidak ada jadwal"],
+        "minggu" : ["Tidak ada jadwal"]
+        
+    }
+]

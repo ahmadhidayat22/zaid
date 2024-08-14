@@ -1,5 +1,5 @@
 const moment = require("moment-timezone");
-moment.tz.setDefault("Asia/Jakarta").locale("id");
+moment.tz.setDefault("Asia/Makassar").locale("id");
 const fs = require("fs-extra");
 const axios = require("axios");
 const { color } = require("./utils");
@@ -44,7 +44,7 @@ let medium = JSON.parse(fs.readFileSync("./settings/medium.json"));
 let hard = JSON.parse(fs.readFileSync("./settings/hard.json"));
 const _point = JSON.parse(fs.readFileSync("./settings/point.json"));
 let updateBot = JSON.parse(fs.readFileSync("./settings/update.json"));
-
+let jadwal = JSON.parse(fs.readFileSync("./settings/jadwal.json"));
 let { ownerNumber, groupLimit, limitCount, memberLimit, prefix } = setting;
 
 module.exports = message = async (m, message, startTime) => {
@@ -1154,7 +1154,96 @@ module.exports = message = async (m, message, startTime) => {
 						console.log(color("ERROR", "red"), error);
 					}
 					break;
+				case "jadwal":
+					const date = new Date();
+					const day = date.getDay();
+					const waktuskrg = moment().format('dddd, Do MMM YYYY')
+			
+					const jdwll = jadwal[0];
+					try {
+						let currJdwl, upJdwl;
 
+						const mappingJdwl = async(hari) => {
+							
+							let pesan = `${hari.toUpperCase()}\n`;
+							await jdwll[hari].forEach(i => {
+								pesan += `${i}\n`
+							})
+							return(pesan)
+															
+						}
+						
+
+						// 0 = minggu, 1 = senin, ..., 6 = sabtu 
+						switch (day) {
+							case 0:
+								currJdwl =  await mappingJdwl("minggu");;
+								upJdwl = await mappingJdwl("senin");
+
+								break;
+							case 1:
+								currJdwl =  await mappingJdwl("senin");
+								upJdwl = await mappingJdwl("selasa");
+								break;
+
+							case 2:
+								currJdwl =  await mappingJdwl("selasa");
+								upJdwl = await mappingJdwl("rabu");
+								break;
+
+							case 3:
+								currJdwl =  await mappingJdwl("rabu");
+								upJdwl = await mappingJdwl("kamis");
+								break;
+
+							case 4:
+								currJdwl =  await mappingJdwl("kamis");
+								upJdwl = await mappingJdwl("jumat");
+								break;
+
+							case 5:
+								currJdwl =  await mappingJdwl("jumat");
+								upJdwl = await mappingJdwl("sabtu");
+								break;
+
+							case 6:
+								currJdwl =  await mappingJdwl("sabtu");
+								upJdwl = await mappingJdwl("minggu");
+								break;
+
+
+							default:
+								break;
+						
+								
+							}
+						await m.reply(from, `_${waktuskrg}_\n\n*Hari ini*\n${ currJdwl } \n\n*Besok*\n${upJdwl}`, id)
+
+					} catch (error) {
+						logerr(error);
+						await m.reply(from, "ada yang error", id);
+
+					}
+					break;
+				case "lsjadwal":
+					try {
+						let jadwalMsg = ''
+						const jdwl = jadwal[0]
+						Object.keys(jdwl).forEach(e => {
+							jadwalMsg += `${e.toUpperCase()}\n`
+							jdwl[e].forEach(i => {
+								jadwalMsg += `${i}\n`
+							})
+							jadwalMsg += `\n`
+						});
+						await m.reply(from, jadwalMsg, id);
+
+
+					} catch (error) {
+						logerr(error);
+						await m.reply(from, "ada yang error", id);
+					}
+					break;
 				///////////////////////////////////// MENU //////////////////////////////////////
 				case "info":
 					const endTime = calcRuntime();
