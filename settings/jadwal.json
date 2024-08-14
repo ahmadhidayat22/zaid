@@ -20,14 +20,17 @@
         "kamis": [
             "07:30-09:00 || C 302 || Komputasi Awan",
             "07:30-09:00 || C 304 || Pemrograman Piranti Bergerak",
-            "10:50-12:20 || C 302 || Etika Profesi"
+            "10:50-12:20 || C 304 || Keamanan Komputer",
+            "13:00-14:30 || C 302 || Etika Profesi",
+            "09:10-10:40 || C 307 || Manajemen Proyek TI"
            
         ],
         "jumat": [
             "09:10-10:40 || C306 || Kalkulus"
         ],
-        "sabtu" : ["Tidak ada jadwal"],
-        "minggu" : ["Tidak ada jadwal"]
+        "sabtu" : ["Kosong pok"],
+        "minggu" : ["Kosong pok"]
         
     }
 ]
+
