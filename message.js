@@ -1,5 +1,6 @@
 const moment = require("moment-timezone");
 moment.tz.setDefault("Asia/Makassar").locale("id");
+const schedule = require('node-schedule');
 const fs = require("fs-extra");
 const axios = require("axios");
 const { color } = require("./utils");
@@ -31,6 +32,7 @@ const { log } = require("console");
 const { isUrl, processTime } = require("./utils");
 const kuismtk = JSON.parse(fs.readFileSync("./settings/kuismtk.json"));
 const kuismtkk = JSON.parse(fs.readFileSync("./settings/kuismtkk.json"));
+const jadwall = JSON.parse(fs.readFileSync("./settings/reminderJadwal.json"))
 //////////////////////////////FOLDER SYSTEM///////////////////////////////////
 const setting = JSON.parse(fs.readFileSync("./settings/setting.json"));
 const banned = JSON.parse(fs.readFileSync("./settings/banned.json"));
@@ -133,6 +135,7 @@ module.exports = message = async (m, message, startTime) => {
 		const url = args.length !== 0 ? args[0] : "";
 		const isKuis = isGroupMsg ? kuis.includes(chat.id) : false;
 		const isMtk = isGroupMsg ? kuismtk.includes(chat.id) : false;
+		const isJadwal =  jadwall.includes(chat.id) || false;
 		const isMtkk = isGroupMsg ? kuismtkk.includes(chat.id) : false;
 		const checkStat = isCmd && command == "mystat" ? true : false;
 		const isTeks = args.length == 0 ? true : false;
@@ -437,7 +440,80 @@ module.exports = message = async (m, message, startTime) => {
 			}
 		  }
 
+		const getJadwal = async() =>{
+			const date = new Date();
+			// const day = date.getDay();
+			const day = 5;
+			const waktuskrg = moment().format('dddd, Do MMM YYYY')
 		
+			const jdwll = jadwal[0];
+			try {
+				let currJdwl, upJdwl;
+
+				const mappingJdwl = async(hari) => {
+					
+					let pesan = `${hari.toUpperCase()}\n`;
+					await jdwll[hari].forEach(i => {
+						pesan += `${i}\n`
+					})
+					return(pesan)
+													
+				}
+				
+
+				// 0 = minggu, 1 = senin, ..., 6 = sabtu 
+				switch (day) {
+					case 0:
+						currJdwl =  await mappingJdwl("minggu");;
+						upJdwl = await mappingJdwl("senin");
+
+						break;
+					case 1:
+						currJdwl =  await mappingJdwl("senin");
+						upJdwl = await mappingJdwl("selasa");
+						break;
+
+					case 2:
+						currJdwl =  await mappingJdwl("selasa");
+						upJdwl = await mappingJdwl("rabu");
+						break;
+
+					case 3:
+						currJdwl =  await mappingJdwl("rabu");
+						upJdwl = await mappingJdwl("kamis");
+						break;
+
+					case 4:
+						currJdwl =  await mappingJdwl("kamis");
+						upJdwl = await mappingJdwl("jumat");
+						break;
+
+					case 5:
+						currJdwl =  await mappingJdwl("jumat");
+						upJdwl = await mappingJdwl("sabtu");
+						break;
+
+					case 6:
+						currJdwl =  await mappingJdwl("sabtu");
+						upJdwl = await mappingJdwl("minggu");
+						break;
+
+
+					default:
+						break;
+				
+						
+					}
+				await m.sendText(from, `_${waktuskrg}_\n\n*Hari ini*\n${ currJdwl } \n\n*Besok*\n${upJdwl}`)
+
+			} catch (error) {
+				logerr(error);
+				await m.sendText(from, "ada yang error");
+
+			}
+		}	
+
+
 		/////////////////////// QUIZ MTK //////////////////////////////
 
 		if (isGroupMsg) {
@@ -793,34 +869,7 @@ module.exports = message = async (m, message, startTime) => {
 						});
 					break;
 
-				// case "welcome":
-				// 	const ppLinks = await m.getProfilePicFromServer(sender.id);
-				// 	if (ppLinks === undefined || ppLinks == "ERROR: 404" || ppLinks == "ERROR: 401") {
-				// 		var pepe = errorImgg;
-				// 	} else {
-				// 		pepe = ppLinks;
-				// 	}
-				// 	const card = new Welcomer()
-				// 		.setAvatar(pepe)
-				// 		.setUsername(pushname)
-				// 		.setDiscriminator(sender.id.substring(6, 10))
-				// 		.setGuildName(name || formattedTitle)
-				// 		.setMemberCount(groupMembers.length);
-
-				// 	card
-				// 		.build()
-				// 		.then(async (buffer) => {
-				// 			const imageBase64 = `data:image/png;base64,${buffer.toString(
-				// 				"base64"
-				// 			)}`;
-				// 			await m.sendImage(from, imageBase64, "welcome.png", "", id);
-				// 		})
-				// 		.catch(async (err) => {
-				// 			console.error(err);
-				// 			await m.reply(from, "Error!", id);
-				// 		});
-				// 	break;
-
+	nh
 				case "tts":
 					if (args.length === 0)
 						return m.reply(
@@ -1154,74 +1203,76 @@ module.exports = message = async (m, message, startTime) => {
 						console.log(color("ERROR", "red"), error);
 					}
 					break;
-				case "jadwal":
-					const date = new Date();
-					const day = date.getDay();
-					const waktuskrg = moment().format('dddd, Do MMM YYYY')
-			
-					const jdwll = jadwal[0];
-					try {
-						let currJdwl, upJdwl;
+				case "setjadwal":
+					if(isJadwal) return m.reply(from, `pengingat sudah ditambahkan`, id);
+					if(args.length !== 1) return  m.reply(from, `nasukkan waktu untuk pengingat jadwal matkul, contoh : *${prefix}setjadwal 21:00* maka akan membuat reminder setiap jam 21:00 (format 24 jam)`, id);
 
-						const mappingJdwl = async(hari) => {
-							
-							let pesan = `${hari.toUpperCase()}\n`;
-							await jdwll[hari].forEach(i => {
-								pesan += `${i}\n`
-							})
-							return(pesan)
-															
-						}
+					function isValidTimeFormat(text) {
+						const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/
+						const timeregex2 = /./g
+						return timeregex2.test(text)
+					}
+
+					// Contoh penggunaan:
+					const testTime = args[0];
+					if (isValidTimeFormat(testTime)) {
+						let timeClean = testTime.split(":");
+						let [hours, minute] = timeClean;
+
+						// console.log(hours, minute);
+						await m.reply(from, `pengingat jadwal di set setiap ${testTime} `, id)
+						jadwall.push(chatId);
+						fs.writeFileSync(
+							"./settings/reminderJadwal.json",
+							JSON.stringify(jadwall)
+						);
 						
+						const cronSchedule = `*/10 * * * * *`;
+						console.log(cronSchedule);
+						const job = schedule.scheduleJob(cronSchedule, async () => {
+							// console.log('Mengirim pesan setiap ', cronSchedule);
+							// const message = 'Selamat pagi! Ini adalah pesan otomatis Anda.';
+					  
+							try {
+							//   await m.sendText(from, message);
+								getJadwal();
 
-						// 0 = minggu, 1 = senin, ..., 6 = sabtu 
-						switch (day) {
-							case 0:
-								currJdwl =  await mappingJdwl("minggu");;
-								upJdwl = await mappingJdwl("senin");
-
-								break;
-							case 1:
-								currJdwl =  await mappingJdwl("senin");
-								upJdwl = await mappingJdwl("selasa");
-								break;
-
-							case 2:
-								currJdwl =  await mappingJdwl("selasa");
-								upJdwl = await mappingJdwl("rabu");
-								break;
-
-							case 3:
-								currJdwl =  await mappingJdwl("rabu");
-								upJdwl = await mappingJdwl("kamis");
-								break;
-
-							case 4:
-								currJdwl =  await mappingJdwl("kamis");
-								upJdwl = await mappingJdwl("jumat");
-								break;
-
-							case 5:
-								currJdwl =  await mappingJdwl("jumat");
-								upJdwl = await mappingJdwl("sabtu");
-								break;
-
-							case 6:
-								currJdwl =  await mappingJdwl("sabtu");
-								upJdwl = await mappingJdwl("minggu");
-								break;
-
-
-							default:
-								break;
-						
-								
+							  console.log('Pesan berhasil dikirim.');
+							} catch (error) {
+							  console.error('Gagal mengirim pesan:', error);
 							}
-						await m.reply(from, `_${waktuskrg}_\n\n*Hari ini*\n${ currJdwl } \n\n*Besok*\n${upJdwl}`, id)
+						});
+						console.log(job.nextInvocation());
 
+
+					} else {
+						await m.reply(from, `${testTime} Bukan format waktu yang valid`, id)
+					}
+
+					
+
+					
+					break
+					
+				case "offjadwal":
+					// jadwalSet = 'off'
+					let jadwalClient = jadwall.indexOf(chatId);
+					jadwall.splice(jadwalClient, 1);
+					fs.writeFileSync("./settings/reminderJadwal.json", JSON.stringify(jadwall, null, 2));
+					// log(jadwall)
+					schedule.gracefulShutdown();
+					
+					await m.reply(from, 'Penjadwalan pesan telah dinonaktifkan', id)
+
+					break
+				
+	
+				case "jadwal":
+					try {
+						
+						getJadwal()
 					} catch (error) {
 						logerr(error);
-						await m.reply(from, "ada yang error", id);
 
 					}
 					break;

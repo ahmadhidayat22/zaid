@@ -11,6 +11,7 @@ const errorImgg = "https://i.ibb.co/jRCpLfn/user.png";
 const setting = JSON.parse(fs.readFileSync("./settings/setting.json"));
 let { ownerNumber, groupLimit, limitCount, memberLimit, prefix } = setting;
 
+const schedule = require('node-schedule');
 
 
 /**
@@ -107,7 +108,8 @@ function start(client) {
     } 
   })
 
-  
+
+ 
 
 }
 
