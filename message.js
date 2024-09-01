@@ -1204,7 +1204,9 @@ module.exports = message = async (m, message, startTime) => {
 					}
 					break;
 				case "setjadwal":
-					if(isJadwal) return m.reply(from, `pengingat sudah ditambahkan`, id);
+					if(isJadwal) return m.reply(from, `pengingat otomatis telah ditambahkan, silahkan hapus schedule sebelumnya terlebih dahulu dengan cara *${prefix}offjadwal*`, id);
+					if (!isOwnerBot) return m.reply(from , `hanya owner yang bisa menggunakan menu ini`, id);
+
 					if(args.length !== 1) return  m.reply(from, `masukkan waktu untuk pengingat jadwal matkul, contoh : *${prefix}setjadwal 21:00* maka akan membuat reminder setiap jam 21:00 (format 24 jam)`, id);
 
 					function isValidTimeFormat(text) {
@@ -1255,7 +1257,9 @@ module.exports = message = async (m, message, startTime) => {
 					break
 					
 				case "offjadwal":
-					// jadwalSet = 'off'
+					if (!isOwnerBot) return m.reply(from , `hanya owner yang bisa menggunakan menu ini`, id);
+					try {
+						// jadwalSet = 'off'
 					let jadwalClient = jadwall.indexOf(chatId);
 					jadwall.splice(jadwalClient, 1);
 					fs.writeFileSync("./settings/reminderJadwal.json", JSON.stringify(jadwall, null, 2));
@@ -1264,6 +1268,11 @@ module.exports = message = async (m, message, startTime) => {
 					
 					await m.reply(from, 'Penjadwalan pesan telah dinonaktifkan', id)
 
+					} catch (error) {
+						await m.reply(from, `Error \n${error}`, id)
+						logerr(error)
+					}
+					
 					break
 				
 	
