@@ -369,7 +369,7 @@ module.exports = message = async (m, message, startTime) => {
 		};
 
 		const sayMaintenance = async (In, to) => {
-			await m.reply(In, "maaf fitur masih dibuat", to);
+			await m.reply(In, "⚠ sedang perbaikan .....", to);
 		};
 		const logerr = (error) => {
 			console.log(color("ERROR", 'red'), error)
