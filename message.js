@@ -2417,7 +2417,7 @@ module.exports = message = async (m, message, startTime) => {
 					}
 					break;
 
-				case "spotify":
+				case "spotifysearch":
 					if (isTeks)
 						return await m.reply(
 							from,
