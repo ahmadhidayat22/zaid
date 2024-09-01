@@ -1227,7 +1227,7 @@ module.exports = message = async (m, message, startTime) => {
 							JSON.stringify(jadwall)
 						);
 						
-						const cronSchedule = `${minute} ${hours} * * * *`;
+						const cronSchedule = `${minute} ${hours} * * * `;
 						console.log(cronSchedule);
 						const job = schedule.scheduleJob(cronSchedule, async () => {
 							// console.log('Mengirim pesan setiap ', cronSchedule);
