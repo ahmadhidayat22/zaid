@@ -442,8 +442,8 @@ module.exports = message = async (m, message, startTime) => {
 
 		const getJadwal = async() =>{
 			const date = new Date();
-			// const day = date.getDay();
-			const day = 5;
+			const day = date.getDay();
+			// const day = 5;
 			const waktuskrg = moment().format('dddd, Do MMM YYYY')
 		
 			const jdwll = jadwal[0];
@@ -1205,7 +1205,7 @@ module.exports = message = async (m, message, startTime) => {
 					break;
 				case "setjadwal":
 					if(isJadwal) return m.reply(from, `pengingat sudah ditambahkan`, id);
-					if(args.length !== 1) return  m.reply(from, `nasukkan waktu untuk pengingat jadwal matkul, contoh : *${prefix}setjadwal 21:00* maka akan membuat reminder setiap jam 21:00 (format 24 jam)`, id);
+					if(args.length !== 1) return  m.reply(from, `masukkan waktu untuk pengingat jadwal matkul, contoh : *${prefix}setjadwal 21:00* maka akan membuat reminder setiap jam 21:00 (format 24 jam)`, id);
 
 					function isValidTimeFormat(text) {
 						const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/
@@ -1227,7 +1227,7 @@ module.exports = message = async (m, message, startTime) => {
 							JSON.stringify(jadwall)
 						);
 						
-						const cronSchedule = `*/10 * * * * *`;
+						const cronSchedule = `${minute} ${hours} * * * *`;
 						console.log(cronSchedule);
 						const job = schedule.scheduleJob(cronSchedule, async () => {
 							// console.log('Mengirim pesan setiap ', cronSchedule);
@@ -1242,7 +1242,7 @@ module.exports = message = async (m, message, startTime) => {
 							  console.error('Gagal mengirim pesan:', error);
 							}
 						});
-						console.log(job.nextInvocation());
+						// console.log(job.nextInvocation());
 
 
 					} else {
