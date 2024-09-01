@@ -1209,8 +1209,8 @@ module.exports = message = async (m, message, startTime) => {
 
 					function isValidTimeFormat(text) {
 						const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/
-						const timeregex2 = /./g
-						return timeregex2.test(text)
+						// const timeregex2 = /./g
+						return timeRegex.test(text)
 					}
 
 					// Contoh penggunaan:
